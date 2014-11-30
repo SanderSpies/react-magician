@@ -1,5 +1,8 @@
 {
   "name": "react-animation",
   "version": "0.0.1",
-  "description": "Animation library for React"
+  "description": "Animation library for React",
+  "dependencies": {
+    "easing-functions": "0.1.0"
+  }
 }

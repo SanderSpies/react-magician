@@ -1,0 +1,19 @@
+{
+  "name": "react-animation-simple-example",
+  "version": "1.0.0",
+  "description": "Example app which demonstrates React Animation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "0.12.1",
+    "jsx-loader": "0.12.2"
+  },
+  "devDependencies": {
+    "webpack": "1.4.13"
+
+  }
+}

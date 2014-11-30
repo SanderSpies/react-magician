@@ -3,59 +3,59 @@
  */
 'use strict';
 
-// TODO: how to support custom Animation strategies like rebound-js
+var React = require('react');
+var ReactAnimation = require('react-animation');
 
-var dropBallAnimation = ReactAnimation({
+var simpleAnimation = ReactAnimation({
 
-  '0.1s': {
-
-    ball : {
-      bottom: 100,
-      left: 10
+  _0ms: {
+    block: {
+      left: 0,
+      strategy: ReactAnimation.lineair // default
     }
-
   },
 
-  '0.2s': {
-
-    ball: {
-      bottom: 0,
-      left: 30
+  _1000ms: {
+    block: {
+      left: 200
     }
-
-  },
-
-  '0.3s': {
-
-    ball: {
-      bottom: 80,
-      left: 50
-    }
-
   }
 
 });
 
-class Something {
+class App {
 
   render() {
-    var animationFrame = dropBallAnimation.nextAnimationFrame();
-    return <div styles={animationFrame.ball}>
-
-    </div>;
+    var blockStyle = simpleAnimation.block || {};
+    blockStyle.display =  'inline-block';
+    blockStyle.position = 'absolute';
+    return <div style={{position: 'relative'}}>
+        <div style={blockStyle}>pleh</div>;
+        <div>
+          <button onClick={this.onPlayClick}>Play</button>
+          <button onClick={this.onPauseClick}>Pause</button>
+        </div>
+      </div>;
   }
 
-  componentDidUpdate() {
-    requestAnimationFrame(this.render);
+  onPlayClick() {
+    simpleAnimation.play();
   }
 
   onPauseClick() {
-    dropBallAnimation.pause();
+    simpleAnimation.pause();
   }
 
-  onContinueClick() {
-    dropBallAnimation.continue();
+  componentDidMount() {
+    var self = this;
+    simpleAnimation.onAnimationFrame(function(){
+      self.forceUpdate();
+    });
   }
-
 }
 
+var Pleh = React.createClass(App.prototype);
+
+React.render(<Pleh />, document.getElementById('app'));
+
+simpleAnimation.play();
