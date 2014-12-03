@@ -13,7 +13,7 @@
     "jsx-loader": "0.12.2"
   },
   "devDependencies": {
-    "webpack": "1.4.13"
-
+    "webpack": "1.4.13",
+    "jsx-loader": "0.12.2"
   }
 }

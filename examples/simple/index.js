@@ -5,19 +5,35 @@
 
 var React = require('react');
 var ReactAnimation = require('react-animation');
+//var EasingTypes = require('react-animation/lib/EasingTypes');
 
 var simpleAnimation = ReactAnimation({
 
-  _0ms: {
+  '0ms': {
     block: {
       left: 0,
-      strategy: ReactAnimation.lineair // default
+      easing: function() {
+        console.log('rarara');
+      }
     }
   },
 
-  _1000ms: {
+  '1s': {
     block: {
-      left: 200
+      left: 200,
+      top: 0
+    }
+  },
+
+  '2s': {
+    block: {
+      top: 100
+    }
+  },
+
+  '3s': {
+    block: {
+      top: 0
     }
   }
 
@@ -26,15 +42,12 @@ var simpleAnimation = ReactAnimation({
 class App {
 
   render() {
-    var blockStyle = simpleAnimation.block || {};
+    var animationValues = simpleAnimation.values;
+    var blockStyle = animationValues.block || {};
     blockStyle.display =  'inline-block';
     blockStyle.position = 'absolute';
     return <div style={{position: 'relative'}}>
-        <div style={blockStyle}>pleh</div>;
-        <div>
-          <button onClick={this.onPlayClick}>Play</button>
-          <button onClick={this.onPauseClick}>Pause</button>
-        </div>
+        <div style={blockStyle}>pleh</div>
       </div>;
   }
 
