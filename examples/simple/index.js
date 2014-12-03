@@ -15,6 +15,10 @@ var simpleAnimation = ReactAnimation({
       easing: function() {
         console.log('rarara');
       }
+    },
+
+    block2: {
+      left: 100
     }
   },
 
@@ -28,12 +32,23 @@ var simpleAnimation = ReactAnimation({
   '2s': {
     block: {
       top: 100
+    },
+
+    block2: {
+      left: 300,
+      top: 0
     }
   },
 
   '3s': {
     block: {
       top: 0
+    }
+  },
+
+  '4s': {
+    block2: {
+      top: 200
     }
   }
 
@@ -46,8 +61,12 @@ class App {
     var blockStyle = animationValues.block || {};
     blockStyle.display =  'inline-block';
     blockStyle.position = 'absolute';
+    var blockStyle2 = animationValues.block2 || {};
+    blockStyle2.display =  'inline-block';
+    blockStyle2.position = 'absolute';
     return <div style={{position: 'relative'}}>
-        <div style={blockStyle}>pleh</div>
+        <div style={blockStyle}>foo</div>
+        <div style={blockStyle2}>foo</div>
       </div>;
   }
 
@@ -67,8 +86,8 @@ class App {
   }
 }
 
-var Pleh = React.createClass(App.prototype);
+var Foo = React.createClass(App.prototype);
 
-React.render(<Pleh />, document.getElementById('app'));
+React.render(<Foo />, document.getElementById('app'));
 
 simpleAnimation.play();
