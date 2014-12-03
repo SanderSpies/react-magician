@@ -2,6 +2,8 @@ React Animation
 ===
 Animate multiple elements on a time-based scale.
 
+Still very experimental!
+
 Inspiration
 ---
 The great work of Cheng Lou and Pete Hunt
