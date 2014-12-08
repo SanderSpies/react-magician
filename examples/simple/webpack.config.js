@@ -17,8 +17,16 @@ module.exports = {
   module: {
     loaders: [
       {
+        test:/\.html$/,
+        loader: 'html-loader'
+      },
+      {
         test: /\.js$/,
         loader: 'jsx-loader?harmony'
+      },
+      {
+        test: /\.(otf|eot|svg|ttf|woff)/,
+        loader: 'url-loader?limit=8192'
       }
     ]
   },
