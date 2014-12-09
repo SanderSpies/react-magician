@@ -12,6 +12,7 @@ var Shadow =          require('react-material/components/Shadow');
 var Colors =          require('react-material/style/Colors');
 var AppBar =          require('react-material/components/AppBar');
 var EasingTypes =     ReactAnimation.EasingTypes();
+var DOMOperation =    ReactAnimation.DOMOperation;
 
 class App {
 
@@ -26,16 +27,17 @@ class App {
     return <div style={{position: 'relative'}}>
         <AppBar onNavButtonClick={this.onNavButtonClick}  styles={{normalAppBarStyle: ReactStyle(othersStyle)}} />
         <div>
-          <div styles={[TileStyles.normalStyle, ReactStyle(tileStyle)]}  onClick={this.onTileClick}>
+
+          <div styles={[TileStyles.normalStyle, ReactStyle(othersStyle)]}>
+            <Shadow size={1} />
+          </div>
+          <div styles={[TileStyles.normalStyle, ReactStyle(othersStyle)]}>
+            <Shadow size={1} />
+          </div>
+          <div ref="animatingElement" styles={[TileStyles.normalStyle, ReactStyle(tileStyle)]}  onClick={this.onTileClick}>
             <Shadow size={1} styles={ReactStyle(tileShadowStyle)} />
           </div>
           <div styles={[TileStyles.replacementStyle, ReactStyle(animationValues.replacementStyle)]} />
-          <div styles={[TileStyles.normalStyle, ReactStyle(othersStyle)]}>
-            <Shadow size={1} />
-          </div>
-          <div styles={[TileStyles.normalStyle, ReactStyle(othersStyle)]}>
-            <Shadow size={1} />
-          </div>
           <div styles={[TileStyles.normalStyle, ReactStyle(othersStyle)]}>
             <Shadow size={1} />
           </div>
@@ -60,7 +62,7 @@ class App {
   }
 
   onTileClick() {
-    TileStyles.expandAnimation.play();
+    TileStyles.expandAnimation.play({refs: this.refs});
   }
 
   componentDidMount() {
@@ -92,22 +94,21 @@ var TileStyles = {
     '0ms': {
 
       tileStyle: {
-        borderRadius:   '0%',
-        width:          200,
-        height:         200,
-        marginTop:      0,
-        marginLeft:     0,
-        marginBottom:   0,
-        marginRight:    0,
-        position:       'absolute',
-        top:            '0%',
-        easing:         EasingTypes.easeInOutElastic
+        borderRadius:     '0%',
+        width:            200,
+        height:           200,
+        marginTop:        0,
+        marginLeft:       0,
+        position:         'absolute',
+        top:              0,
+        webkitTransform:  'translateZ(0)',
+        willChange:       'all'
       },
 
       replacementStyle: {
-        position: 'relative',
-        width: '204px',
-        height: '204px'
+        position:   'relative',
+        width:      '204px',
+        height:     '204px'
       },
 
       tileShadowStyle: {
@@ -117,6 +118,7 @@ var TileStyles = {
       othersStyle: {
         opacity: 1
       }
+
     },
 
     '2000ms': {
@@ -127,7 +129,9 @@ var TileStyles = {
         height: 60,
         marginLeft: 70,
         marginTop: 70,
-        left:           '0%',
+        left: DOMOperation(function(refs) {
+          return refs.animatingElement.getDOMNode().offsetLeft;
+        }),
         zIndex: 40
       },
 
@@ -146,7 +150,7 @@ var TileStyles = {
       tileStyle: {
         left:         '50%',
         marginLeft:    -30,
-        top:      '0%'
+        top:          '0%'
       }
 
     },
