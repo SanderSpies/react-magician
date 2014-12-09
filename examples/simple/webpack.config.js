@@ -11,7 +11,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'react-animation$': require.resolve('../../lib/index')
+      'react-animation$': require.resolve('../../lib/')
     }
   },
   module: {

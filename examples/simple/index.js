@@ -11,9 +11,7 @@ var ReactAnimation =  require('react-animation');
 var Shadow =          require('react-material/components/Shadow');
 var Colors =          require('react-material/style/Colors');
 var AppBar =          require('react-material/components/AppBar');
-
-//var EasingTypes = require('react-animation/lib/EasingTypes');
-
+var EasingTypes =     ReactAnimation.EasingTypes();
 
 class App {
 
@@ -57,7 +55,7 @@ class App {
       </div>;
   }
 
-  onNavButtonClick(){
+  onNavButtonClick() {
 
   }
 
@@ -86,6 +84,7 @@ var TileStyles = {
     position:         'relative',
     backgroundColor:  Colors.purple.P300,
     margin:           2
+
   }),
 
   expandAnimation: ReactAnimation({
@@ -101,7 +100,8 @@ var TileStyles = {
         marginBottom:   0,
         marginRight:    0,
         position:       'absolute',
-        top:            '0%'
+        top:            '0%',
+        easing:         EasingTypes.easeInOutElastic
       },
 
       replacementStyle: {
@@ -119,7 +119,7 @@ var TileStyles = {
       }
     },
 
-    '200ms': {
+    '2000ms': {
 
       tileStyle: {
         borderRadius: '100%',
@@ -141,7 +141,7 @@ var TileStyles = {
 
     },
 
-    '400ms': {
+    '4000ms': {
 
       tileStyle: {
         left:         '50%',
@@ -151,13 +151,13 @@ var TileStyles = {
 
     },
 
-    '500ms': {
+    '5000ms': {
 
       tileStyle: {
-        top:            '-50%'
+        top:  '-10%' // offsetHeight(tile) | scrollHeight(tile)
       },
 
-      othersStyle: {
+      othersStyle:  {
         opacity: 0
       }
 
