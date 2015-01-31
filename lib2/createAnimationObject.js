@@ -1,5 +1,6 @@
 'use strict';
 
+// TODO: make it easier to loop over by turning it into an array instead
 function createAnimationObject(config) {
   // create structure that will be re-used again and again and again and...
   var structure = {};
@@ -36,3 +37,26 @@ function createAnimationObject(config) {
 }
 
 module.exports = createAnimationObject;
+
+
+/**
+ * [
+ *    {
+ *       timepoint: ms,
+ *       blocks: [
+ *        {
+ *          name: '',
+ *          cssProperties: [
+ *            {
+ *              name: '',
+ *              value: ''
+ *            }
+ *          ]
+ *        }
+ *       ]
+ *    }
+ *
+ * ]
+ *
+ *
+ */

@@ -2,32 +2,90 @@ React Animation
 ===
 Animate multiple elements on a time-based scale.
 
-Still very experimental! Code is really fugly at the moment - will improve this once the API feels complete-ish.
+Example:
 
-Inspiration
----
-The great work of Cheng Lou and Pete Hunt
+```
+/**
+ * @jsx React.DOM
+ */
+'use strict';
 
-How does it work?
----
-It spawns the calculations of the animation into a webworker. The webworker updates the animation values when needed, and these animation values are picked up inside a requestAnimationFrame. 
+var React           = require('react');
+var ReactAnimation  = require('react-animation');
 
-What's missing?
----
-- Work with element dimensions
+var Animation       = ReactAnimation.Animation;
 
-  Currently working on fixing this with:
-  ```
-          left: DOMOperation(function(refs) {
-            return refs.animatingElement.getDOMNode().offsetLeft;
-          }),
-  ```
-  Not sure if this is the right approach though - it does show a weak part in the current design.
+class Foo extends React.Component {
 
-- Pause animation
-- Jump to time position
-- Jump to percentage
-- Examples
+  constructor() {
+
+    /*ReactAnimation.registerEasing({customFunc: null}, function(t, b, _c, d){
+      var c = _c - b;
+      return c * (t /= d) * t + b;
+    });*/
+
+    this.animations = {
+      fooBarAnimation: Animation`
+        0ms {
+          blockA {
+            left: 0
+            top:  20
+          }
+          blockB {
+            left: 200
+            top:  300
+          }
+        }
+        100ms {
+          blockA easeIn {
+            left: 200
+            top:  500
+          }
+        }
+        200ms {
+          blockA {
+            left: 30
+            top:  exec('React.findDOMNode(this).scrollHeight - 300 : 0')
+          }
+          blockB {
+            left: 0
+            top:  exec('React.findDOMNode(this).scrollHeight - 100 : 20')
+          }
+        }
+      `
+    };
+  }
+
+  render() {
+    var fooBarAnimationValues = this.animations.fooBarAnimation.values;
+    return <div>
+      <div style={fooBarAnimationValues.blockA}>
+
+      </div>
+      <div style={fooBarAnimationValues.blockB}>
+
+      </div>
+    </div>;
+  }
+
+  onClick() {
+    this.animations.fooBarAnimation.play();
+  }
+
+  componentDidUpdate() {
+    if (this.animations.fooBarAnimation.isBusy) {
+      requestAnimationFrame(this.forceUpdate);
+    }
+  }
+
+}
+
+React.render(<Foo />, document.getElementById('app'));
+
+```
+
+
+
 
 LICENSE
 ---
