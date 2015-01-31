@@ -50,7 +50,7 @@ class Foo extends React.Component {
   }
 
   render() {
-    var fooBarAnimationValues = this.animations.fooBarAnimation.values();
+    var fooBarAnimationValues = this.animations.fooBarAnimation.values(this);
     return <div>
       <div style={fooBarAnimationValues.blockA}>
 
