@@ -5,7 +5,6 @@ var getAnimationFrame = require('./getAnimationFrame');
 var EasingTypes = require('./EasingTypes');
 
 function createAnimationWorker(config) {
-
   function getEndTime(config) {
     var timePoints = config.timePoints;
     return timePoints[timePoints.length - 1];
@@ -41,19 +40,23 @@ function createAnimationWorker(config) {
     var a = {};
     var startTime;
     var currentTime = 0;
-
+    var isWaiting = false;
 
     function loop() {
       currentTime = new Date().getTime() - startTime.getTime();
 
-      getAnimationFrame({
+      isWaiting = getAnimationFrame({
         structure: structure,
         currentTime: currentTime,
         duration: duration,
         config: newConfig
       });
+      if (!isWaiting) {
+        postMessage({value: structure, type: 0});
+      }
 
-      postMessage({value:structure, type: 0});
+      // postMessage
+
       if (!paused && currentTime <= duration) {
         setTimeout(loop, 1000 / 60);
       }
@@ -67,6 +70,9 @@ function createAnimationWorker(config) {
       }
       else if (m.data === 0) {
         paused = true;
+      }
+      else if (m.data === 2) {
+        // TODO: DOMOperation
       }
     })
   }

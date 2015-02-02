@@ -11,6 +11,7 @@ module.exports = {
   },
   resolve: {
     alias: {
+      'react$': require.resolve('../../node_modules/react'),
       'react-animation$': require.resolve('../../lib/')
     }
   },
@@ -33,7 +34,7 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': {
-        NODE_ENV: JSON.stringify('production')
+//        NODE_ENV: JSON.stringify('production')
       }
     })
   ]

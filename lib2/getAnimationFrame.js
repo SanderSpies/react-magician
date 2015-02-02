@@ -3,6 +3,11 @@
 // TODO:
 // - reduce creation of new objects
 // - reduce loops
+// - cache where possible
+// - aim for N(total cssProperties length + easing)
+// - make it JIT-able
+
+var isWaiting = false;
 function getAnimationFrame(options) {
   var config = options.config;
   var currentTime = options.currentTime;
@@ -45,12 +50,13 @@ function getAnimationFrame(options) {
     }
   }
 
-
+  // TODO: at start call DOMOperations, wait for response, continue
   for (i = 0, l = blockNames.length; i < l; i++) {
     blockName = blockNames[i];
     var startCSSProperties = startProperties[blockName];
     var endCSSProperties = endProperties[blockName];
     var cssPropNames = Object.keys(startCSSProperties);
+
     var easing = startCSSProperties.easing ? eval('(' + startCSSProperties.easing.property + ')') : EasingTypes.linear;
     for (j = 0, l2 = cssPropNames.length; j < l2; j++) {
       var cssPropName = cssPropNames[j];
@@ -58,6 +64,8 @@ function getAnimationFrame(options) {
       var end = endCSSProperties[cssPropName] || startCSSProperties[cssPropName];
       var duration = end.timepoint - start.timepoint;
       var currentTime2 = currentTime - start.timepoint;
+
+      // TODO: firstTime visiting prop => is a DOMOperation -> retrieve -> return true
 
       var startProperty = start.property;
       if (typeof startProperty === 'number' && cssPropName !== 'zIndex') {
