@@ -6,7 +6,12 @@
 var React           = require('react');
 var ReactAnimation  = require('react-animation');
 
+// temporary, should be solved using new React Style
+var assign          = require('./assign');
+
 var Animation       = ReactAnimation.Animation;
+
+
 
 class Foo extends React.Component {
 
@@ -21,28 +26,23 @@ class Foo extends React.Component {
       fooBarAnimation: Animation`
         0ms {
           blockA {
-            left: 0 1 2 3
-            top:  20
-          }
-          blockB {
-            left: 200
-            top:  300
-          }
-        }
-        100ms {
-          blockA easeIn {
-            left: 200
-            top:  500
-          }
-        }
-        200ms {
-          blockA {
-            left: 30
-            top:  exec('React.findDOMNode(this).scrollHeight - 300 : 0')
+            left: 0
           }
           blockB {
             left: 0
-            top:  exec('React.findDOMNode(this).scrollHeight - 100 : 20')
+          }
+        }
+        100ms easeInQuad {
+          blockA {
+            left: 200
+          }
+        }
+        400ms {
+          blockA {
+            left: 400
+          }
+          blockB {
+            left: exec('React.findDOMNode(this.refs.foo).offsetLeft + 200|| 0')
           }
         }
       `
@@ -52,23 +52,26 @@ class Foo extends React.Component {
   render() {
     var fooBarAnimationValues = this.animations.fooBarAnimation.values(this);
     return <div>
-      <div style={fooBarAnimationValues.blockA}>
+      <div style={assign({position: 'relative', width: 200, height: 200, backgroundColor: 'orange'}, fooBarAnimationValues.blockA)} ref="foo">
 
       </div>
-      <div style={fooBarAnimationValues.blockB}>
+      <div style={assign({position:'relative', width: 200, height: 200, backgroundColor: 'purple'}, fooBarAnimationValues.blockB)}>
 
       </div>
     </div>;
   }
 
-  onClick() {
-    this.animations.fooBarAnimation.play();
-  }
-
   componentDidUpdate() {
     if (this.animations.fooBarAnimation.isPlaying) {
-      requestAnimationFrame(this.forceUpdate);
+      var self = this;
+      requestAnimationFrame(function(){
+        self.forceUpdate()
+      });
     }
+  }
+
+  componentDidMount() {
+    this.animations.fooBarAnimation.play(this);
   }
 
 }
