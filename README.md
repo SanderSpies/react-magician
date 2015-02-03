@@ -11,71 +11,100 @@ Example:
 'use strict';
 
 var React           = require('react');
-var ReactAnimation  = require('react-animation');
+var Animation       = require('react-animation');
 
-var Animation       = ReactAnimation.Animation;
+// temporary, should be solved using new React Style
+var assign          = require('./assign');
+
 
 class Foo extends React.Component {
 
   constructor() {
 
-    /*ReactAnimation.registerEasing({customFunc: null}, function(t, b, _c, d){
+    Animation.registerEasing('fooEasing', function(t, b, _c, d){
       var c = _c - b;
-      return c * (t /= d) * t + b;
-    });*/
+      if ((t /= d) < (1 / 2.75)) {
+        return c * (7.5625 * t * t) + b;
+      }
+      else if (t < (2 / 2.75)) {
+        return c * (7.5625 * (t -= (1.5 / 2.75)) * t + .75) + b;
+      }
+      else if (t < (2.5 / 2.75)) {
+        return c * (7.5625 * (t -= (2.25 / 2.75)) * t + .9375) + b;
+      }
+      else {
+        return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
+      }
+    });
 
     this.animations = {
-      fooBarAnimation: Animation`
-        0ms {
-          blockA {
-            left: 0
-            top:  20
+      fooBarAnimation: Animation.create({
+        '0ms': {
+          blockA: {
+            left: 0,
+            top: 0,
+            width: 0,
+            transform: 'rotate(0deg)'
+          },
+          blockB: {
+            left: 0,
+            top: 0
           }
-          blockB {
+        },
+        '100ms': {
+          blockA: {
+            easing: 'easeInQuad',
+            left: 100
+          }
+        },
+        '400ms': {
+          blockA: {
             left: 200
-            top:  300
+          },
+          blockB: {
+            left: ()=> { return React.findDOMNode(this.refs.foo).offsetLeft + 200 || 0; }
+          }
+        },
+        '500ms': {
+          blockA: {
+            top: 150
+          },
+          blockB: {
+            easing: 'fooEasing',
+            top: ()=> { return React.findDOMNode(this.refs.foo).offsetTop || 0; }
+          }
+        },
+        '600ms': {
+          blockA: {
+            width: 100,
+            transform: 'rotate(90deg)'
           }
         }
-        100ms {
-          blockA easeIn {
-            left: 200
-            top:  500
-          }
-        }
-        200ms {
-          blockA {
-            left: 30
-            top:  exec('React.findDOMNode(this).scrollHeight - 300 : 0')
-          }
-          blockB {
-            left: 0
-            top:  exec('React.findDOMNode(this).scrollHeight - 100 : 20')
-          }
-        }
-      `
+      })
     };
   }
 
   render() {
-    var fooBarAnimationValues = this.animations.fooBarAnimation.values;
+    var fooBarAnimationValues = this.animations.fooBarAnimation.values(this);
     return <div>
-      <div style={fooBarAnimationValues.blockA}>
-
+      <div className="simple1" style={fooBarAnimationValues.blockA} ref="foo">
       </div>
-      <div style={fooBarAnimationValues.blockB}>
-
+      <div className="simple2" style={fooBarAnimationValues.blockB}>
       </div>
     </div>;
   }
 
-  onClick() {
-    this.animations.fooBarAnimation.play();
+  componentDidUpdate() {
+    if (this.animations.fooBarAnimation.isPlaying) {
+      var self = this;
+      requestAnimationFrame(function() {
+        self.forceUpdate();
+      });
+    }
   }
 
-  componentDidUpdate() {
-    if (this.animations.fooBarAnimation.isBusy) {
-      requestAnimationFrame(this.forceUpdate);
-    }
+  componentDidMount() {
+    this.animations.fooBarAnimation.play(this);
   }
 
 }
