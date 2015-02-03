@@ -6,10 +6,6 @@
 var React           = require('react');
 var Animation       = require('react-animation');
 
-// temporary, should be solved using new React Style
-var assign          = require('./assign');
-
-
 class Foo extends React.Component {
 
   constructor() {
