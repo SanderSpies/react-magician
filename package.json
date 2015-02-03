@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "Animation library for React",
   "peerDependencies": {
-    "react": "0.13.0-beta.1",
     "jsx-loader": "^0.12.2"
   }
 }
