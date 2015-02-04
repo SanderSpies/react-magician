@@ -26,6 +26,10 @@ class Foo extends React.Component {
       }
     });
 
+    this.state = {
+      isPlaying: false
+    };
+
     this.animations = {
       fooBarAnimation: Animation.create({
         '0ms': {
@@ -63,7 +67,7 @@ class Foo extends React.Component {
             top: ()=> { return React.findDOMNode(this.refs.foo).offsetTop || 0; }
           }
         },
-        '600ms': {
+        '6000ms': {
           blockA: {
             width: 100,
             transform: 'rotate(90deg)'
@@ -80,7 +84,36 @@ class Foo extends React.Component {
       </div>
       <div className="simple2" style={fooBarAnimationValues.blockB}>
       </div>
+      <button style={{position:'relative', top: 300}} onClick={(e) => this.onPlayPauseButtonClick(e)}>
+        Play/Pause
+      </button>
+      <button style={{position:'relative', top: 300}} onClick={(e) => this.onResetClick(e)}>
+        Reset
+      </button>
     </div>;
+  }
+
+  onPlayPauseButtonClick() {
+    var fooBarAnimation = this.animations.fooBarAnimation;
+    var state = this.state;
+    if (!state.isPlaying) {
+      fooBarAnimation.play(this);
+      state.isPlaying = true;
+    }
+    else {
+      fooBarAnimation.pause();
+      state.isPlaying = false;
+    }
+  }
+
+  onRewindClick() {
+    this.animations.fooBarAnimation.rewind();
+  }
+
+  onResetClick() {
+    this.animations.fooBarAnimation.reset();
+    this.forceUpdate();
+    this.state.isPlaying = false;
   }
 
   componentDidUpdate() {
@@ -90,10 +123,6 @@ class Foo extends React.Component {
         self.forceUpdate();
       });
     }
-  }
-
-  componentDidMount() {
-    this.animations.fooBarAnimation.play(this);
   }
 
 }
