@@ -55,7 +55,7 @@ class Foo extends React.Component {
             left: 200
           },
           blockB: {
-            left: ()=> { return React.findDOMNode(this.refs.foo).offsetLeft + 200 || 0; }
+            left: ()=> { return React.findDOMNode(this.refs.foo).offsetLeft + 200; }
           }
         },
         '500ms': {
@@ -64,7 +64,7 @@ class Foo extends React.Component {
           },
           blockB: {
             easing: 'fooEasing',
-            top: ()=> { return React.findDOMNode(this.refs.foo).offsetTop || 0; }
+            top: ()=> { return React.findDOMNode(this.refs.foo).offsetTop; }
           }
         },
         '6000ms': {
@@ -84,36 +84,53 @@ class Foo extends React.Component {
       </div>
       <div className="simple2" style={fooBarAnimationValues.blockB}>
       </div>
-      <button style={{position:'relative', top: 300}} onClick={(e) => this.onPlayPauseButtonClick(e)}>
-        Play/Pause
-      </button>
-      <button style={{position:'relative', top: 300}} onClick={(e) => this.onResetClick(e)}>
-        Reset
-      </button>
+      <div  style={{position:'relative', top: 300}}>
+        <button onClick={(e) => this.onPlayPauseButtonClick(e)}>
+          Play/Pause
+        </button>
+        <button onClick={(e) => this.onResetClick(e)}>
+          Reset
+        </button>
+        <button onClick={(e) => this.onRewindClick(e)}>
+          Rewind
+        </button>
+        Speed: <input ref="speed" defaultValue="1" />
+        <input type="range" ref="position" onChange={(e) => this.onPositionChange(e)} min="0" defaultValue="0" max="300" />
+      </div>
     </div>;
+  }
+
+  onPositionChange(e) {
+    var position = parseInt(e.target.value, 10);
+    var fooBarAnimation = this.animations.fooBarAnimation;
+    fooBarAnimation.moveTo(position);
+    this.forceUpdate();
   }
 
   onPlayPauseButtonClick() {
     var fooBarAnimation = this.animations.fooBarAnimation;
+    // doesn't work properly yet
+    fooBarAnimation.setSpeed(React.findDOMNode(this.refs.speed).value);
     var state = this.state;
     if (!state.isPlaying) {
-      fooBarAnimation.play(this);
-      state.isPlaying = true;
+      fooBarAnimation.play();
     }
     else {
       fooBarAnimation.pause();
-      state.isPlaying = false;
     }
+
+    state.isPlaying = !state.isPlaying;
+    this.forceUpdate();
   }
 
   onRewindClick() {
+    // doesn't work yet
     this.animations.fooBarAnimation.rewind();
   }
 
   onResetClick() {
     this.animations.fooBarAnimation.reset();
     this.forceUpdate();
-    this.state.isPlaying = false;
   }
 
   componentDidUpdate() {
