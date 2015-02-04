@@ -13,10 +13,6 @@ Example:
 var React           = require('react');
 var Animation       = require('react-animation');
 
-// temporary, should be solved using new React Style
-var assign          = require('./assign');
-
-
 class Foo extends React.Component {
 
   constructor() {
@@ -74,7 +70,7 @@ class Foo extends React.Component {
             top: ()=> { return React.findDOMNode(this.refs.foo).offsetTop || 0; }
           }
         },
-        '600ms': {
+        '6000ms': {
           blockA: {
             width: 100,
             transform: 'rotate(90deg)'
@@ -91,7 +87,27 @@ class Foo extends React.Component {
       </div>
       <div className="simple2" style={fooBarAnimationValues.blockB}>
       </div>
+      <button onClick={this.onPlayPauseButtonClick}>
+        Play/Pause
+      </button>
+      <button onClick={this.onRewindClick}>
+        Rewind
+      </button>
     </div>;
+  }
+
+  onPlayPauseButtonClick() {
+    var fooBarAnimation = this.animations.fooBarAnimation;
+    if (!this.state.isPlaying) {
+      fooBarAnimation.play();
+    }
+    else {
+      fooBarAnimation.pause();
+    }
+  }
+
+  onRewindClick() {
+    this.animations.fooBarAnimation.rewind();
   }
 
   componentDidUpdate() {
@@ -101,10 +117,6 @@ class Foo extends React.Component {
         self.forceUpdate();
       });
     }
-  }
-
-  componentDidMount() {
-    this.animations.fooBarAnimation.play(this);
   }
 
 }
