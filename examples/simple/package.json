@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Example app which demonstrates React Animation",
   "main": "index.js",
-  "private": false,
+  "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
