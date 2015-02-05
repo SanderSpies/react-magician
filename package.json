@@ -2,6 +2,7 @@
   "name": "react-magician",
   "version": "0.0.1",
   "description": "Animation library for React",
+  "main": "lib/index.js",
   "devDependencies": {
     "jsx-loader": "^0.12.2"
   },
