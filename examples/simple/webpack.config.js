@@ -11,7 +11,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'react-animation$': require.resolve('../../lib/')
+      'react-magician$': require.resolve('../../lib/')
     }
   },
   module: {
