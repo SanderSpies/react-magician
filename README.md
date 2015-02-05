@@ -13,7 +13,7 @@ Full example:
 'use strict';
 
 var React           = require('react');
-var Animation       = require('react-badwolf');
+var Animation       = require('react-magician');
 
 class Foo extends React.Component {
 
@@ -161,6 +161,4 @@ React.render(<Foo />, document.getElementById('app'));
 LICENSE
 ---
 MIT
-
-[React]: https://facebook.github.io/react/
 
