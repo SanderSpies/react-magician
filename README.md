@@ -2,7 +2,9 @@ React Animation
 ===
 Animate multiple elements on a time-based scale.
 
-Example:
+Looking for contributors! And people who are willing to give feedback!
+
+Full example:
 
 ```
 /**
@@ -156,9 +158,9 @@ React.render(<Foo />, document.getElementById('app'));
 
 ```
 
-
-
-
 LICENSE
 ---
 MIT
+
+[React]: https://facebook.github.io/react/
+

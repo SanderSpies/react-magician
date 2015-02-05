@@ -4,5 +4,14 @@
   "description": "Animation library for React",
   "peerDependencies": {
     "jsx-loader": "^0.12.2"
-  }
+  },
+  "keywords":[
+    "react",
+    "reactjs",
+    "animation",
+    "tweening",
+    "transition",
+    "multiple",
+    "timeline"
+  ]
 }
