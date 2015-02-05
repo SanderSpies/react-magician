@@ -4,7 +4,7 @@
 'use strict';
 
 var React           = require('react');
-var Animation       = require('react-animation');
+var Animation       = require('react-magician');
 
 class Foo extends React.Component {
 

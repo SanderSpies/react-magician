@@ -1,7 +1,7 @@
 {
-  "name": "react-animation-simple-example",
+  "name": "react-magician-simple-example",
   "version": "1.0.0",
-  "description": "Example app which demonstrates React Animation",
+  "description": "Example app which demonstrates React Magician",
   "main": "index.js",
   "private": true,
   "scripts": {

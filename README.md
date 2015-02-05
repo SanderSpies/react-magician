@@ -1,4 +1,4 @@
-React Animation
+React Magician
 ===
 Animate multiple elements on a time-based scale.
 
@@ -13,7 +13,7 @@ Full example:
 'use strict';
 
 var React           = require('react');
-var Animation       = require('react-animation');
+var Animation       = require('react-badwolf');
 
 class Foo extends React.Component {
 
