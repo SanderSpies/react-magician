@@ -3,9 +3,6 @@
   "version": "0.0.2",
   "description": "Animation library for React",
   "main": "lib/index.js",
-  "devDependencies": {
-    "jsx-loader": "^0.12.2"
-  },
   "keywords":[
     "react",
     "reactjs",
