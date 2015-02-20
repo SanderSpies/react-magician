@@ -55,15 +55,17 @@ class Foo extends React.Component {
         },
         '400px': {
           blockA: {
-            left: 200
+            left: 50
           },
           blockB: {
-            left: ()=> { return React.findDOMNode(this.refs.foo).offsetLeft + 200; }
+            left: ()=> { return React.findDOMNode(this.refs.foo).offsetLeft + 50; }
           }
         },
         '500px': {
           blockA: {
-            top: 150
+            top: 100,
+            width: 50,
+            transform: 'rotate(90deg)'
           },
           blockB: {
             easing: 'fooEasing',
@@ -76,10 +78,10 @@ class Foo extends React.Component {
 
   render() {
     var fooBarAnimationValues = this.animations.fooBarAnimation.values(this);
-    return <div className="main" onTouchStart={(e) => this.onTouchStart(e)} onTouchMove={(e) => this.onTouchMove(e)}>
+    return <div className="main">
       <div className="simple1" style={fooBarAnimationValues.blockA} ref="foo">
       </div>
-      <div className="simple2" style={fooBarAnimationValues.blockB}>
+      <div className="simple2" style={fooBarAnimationValues.blockB}  onTouchStart={(e) => this.onTouchStart(e)} onTouchMove={(e) => this.onTouchMove(e)}>
       </div>
     </div>;
   }
@@ -93,6 +95,10 @@ class Foo extends React.Component {
     console.log('foo:', e.touches[0], e.touches[0].clientY, this.startY, pos);
     this.animations.fooBarAnimation.moveTo(pos);
     this.forceUpdate();
+  }
+
+  onTouchEnd(e) {
+    this.endY = e.touches[0].clientY;
   }
 
 }
