@@ -47,13 +47,13 @@ class Foo extends React.Component {
             top: 0
           }
         },
-        '100px': {
+        '50px': {
           blockA: {
             easing: 'easeInQuad',
             left: 100
           }
         },
-        '400px': {
+        '100px': {
           blockA: {
             left: 50
           },
@@ -61,7 +61,7 @@ class Foo extends React.Component {
             left: ()=> { return React.findDOMNode(this.refs.foo).offsetLeft + 50; }
           }
         },
-        '500px': {
+        '150px': {
           blockA: {
             top: 100,
             width: 50,
