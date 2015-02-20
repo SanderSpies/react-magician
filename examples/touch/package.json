@@ -1,0 +1,22 @@
+{
+  "name": "react-magician-simple-example",
+  "version": "1.0.0",
+  "description": "Example app which demonstrates React Magician",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "0.13.0-beta.1"
+  },
+  "devDependencies": {
+    "webpack": "1.4.13",
+    "jsx-loader": "0.12.2",
+
+    "html-loader": "0.2.3",
+    "jsx-loader": "0.12.2"
+  }
+}

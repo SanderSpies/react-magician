@@ -4,6 +4,7 @@
 'use strict';
 
 var React           = require('react');
+React.initializeTouchEvents(true);
 var Animation       = require('react-magician');
 
 class Foo extends React.Component {
@@ -30,9 +31,11 @@ class Foo extends React.Component {
       isPlaying: false
     };
 
+    this.startY = -1;
+
     this.animations = {
       fooBarAnimation: Animation.create({
-        '0ms': {
+        '0px': {
           blockA: {
             left: 0,
             top: 0,
@@ -44,13 +47,13 @@ class Foo extends React.Component {
             top: 0
           }
         },
-        '100ms': {
+        '100px': {
           blockA: {
             easing: 'easeInQuad',
             left: 100
           }
         },
-        '400ms': {
+        '400px': {
           blockA: {
             left: 200
           },
@@ -58,19 +61,13 @@ class Foo extends React.Component {
             left: ()=> { return React.findDOMNode(this.refs.foo).offsetLeft + 200; }
           }
         },
-        '500ms': {
+        '500px': {
           blockA: {
             top: 150
           },
           blockB: {
             easing: 'fooEasing',
             top: ()=> React.findDOMNode(this.refs.foo).offsetTop
-          }
-        },
-        '6000ms': {
-          blockA: {
-            width: 100,
-            transform: 'rotate(90deg)'
           }
         }
       })
@@ -79,67 +76,23 @@ class Foo extends React.Component {
 
   render() {
     var fooBarAnimationValues = this.animations.fooBarAnimation.values(this);
-    return <div>
+    return <div className="main" onTouchStart={(e) => this.onTouchStart(e)} onTouchMove={(e) => this.onTouchMove(e)}>
       <div className="simple1" style={fooBarAnimationValues.blockA} ref="foo">
       </div>
       <div className="simple2" style={fooBarAnimationValues.blockB}>
       </div>
-      <div  style={{position:'relative', top: 300}}>
-        <button onClick={(e) => this.onPlayPauseButtonClick(e)}>
-          Play/Pause
-        </button>
-        <button onClick={(e) => this.onResetClick(e)}>
-          Reset
-        </button>
-        <button onClick={(e) => this.onRewindClick(e)}>
-          Rewind
-        </button>
-        Speed: <input ref="speed" defaultValue="1" />
-        <input type="range" ref="position" onChange={(e) => this.onPositionChange(e)} min="0" defaultValue="0" max="300" />
-      </div>
     </div>;
   }
 
-  onPositionChange(e) {
-    var position = parseInt(e.target.value, 10);
-    var fooBarAnimation = this.animations.fooBarAnimation;
-    fooBarAnimation.moveTo(position);
+  onTouchStart(e) {
+    this.startY = e.touches[0].clientY;
+  }
+
+  onTouchMove(e) {
+    var pos = e.touches[0].clientY - this.startY;
+    console.log('foo:', e.touches[0], e.touches[0].clientY, this.startY, pos);
+    this.animations.fooBarAnimation.moveTo(pos);
     this.forceUpdate();
-  }
-
-  onPlayPauseButtonClick() {
-    var fooBarAnimation = this.animations.fooBarAnimation;
-    // doesn't work properly yet
-    fooBarAnimation.setSpeed(React.findDOMNode(this.refs.speed).value);
-    var state = this.state;
-    if (!state.isPlaying) {
-      fooBarAnimation.play();
-    }
-    else {
-      fooBarAnimation.pause();
-    }
-
-    state.isPlaying = !state.isPlaying;
-    this.forceUpdate();
-  }
-
-  onRewindClick() {
-    // doesn't work yet
-    this.animations.fooBarAnimation.rewind();
-  }
-
-  onResetClick() {
-    this.animations.fooBarAnimation.reset();
-    this.forceUpdate();
-  }
-
-  componentDidUpdate() {
-    if (this.animations.fooBarAnimation.isPlaying) {
-      var self = this;
-      requestAnimationFrame(function() {
-        self.forceUpdate();
-      });
-    }
   }
 
 }

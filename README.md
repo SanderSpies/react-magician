@@ -4,6 +4,13 @@ Animate multiple elements on a time-based scale.
 
 Looking for contributors! And people who are willing to give feedback!
 
+New ideas:
+- add distance based scale (interesting for touch, etc. 
+- currently we only have a time scale, but we should also have a px scale for touch
+- calculate velocity support for touch/mouse?
+- gravity pull etc.? (rebound.js)
+- questions: is this good enough? from tons of examples: YES YES it is.
+
 Full example:
 
 ```

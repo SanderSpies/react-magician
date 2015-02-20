@@ -110,7 +110,7 @@
 	          },
 	          blockB: {
 	            easing: 'fooEasing',
-	            top: function() { return React.findDOMNode(this.refs.foo).offsetTop; }.bind(this)
+	            top: function() {return React.findDOMNode(this.refs.foo).offsetTop;}.bind(this)
 	          }
 	        },
 	        '6000ms': {
@@ -230,15 +230,15 @@
 	  var nextValue = calculateValue(animationPart.nextValue, component);
 	  var type = typeof value;
 	  var nextType = typeof nextValue;
-	  if (animationPart.time === animationPart.nextTime) {
+	  if (animationPart.unit === animationPart.nextUnit) {
 	    return value;
 	  }
 
 	  if (type === 'number' && nextType === 'number') {
-	    var val = EasingTypes[animationPart.nextEasing](currentTimeInMS - animationPart.time,
+	    var val = EasingTypes[animationPart.nextEasing](currentTimeInMS - animationPart.unit,
 	      value,
 	      nextValue,
-	      animationPart.nextTime - animationPart.time);
+	      animationPart.nextUnit - animationPart.unit);
 	    return val;
 	  }
 	  else if (type === 'string' && nextType === 'string') {
@@ -249,10 +249,10 @@
 	      for (var i = 0, l = numbers.length; i < l; i++) {
 	        var nr = parseInt(numbers[i], 10);
 	        var nextNr = parseInt(nextNumbers[i], 10);
-	        var val = EasingTypes[animationPart.nextEasing](currentTimeInMS - animationPart.time,
+	        var val = EasingTypes[animationPart.nextEasing](currentTimeInMS - animationPart.unit,
 	          nr,
 	          nextNr,
-	          animationPart.nextTime - animationPart.time);
+	          animationPart.nextUnit - animationPart.unit);
 	        calculatedNumbers[i] = val;
 	      }
 	    }
@@ -319,10 +319,10 @@
 	    this.moveTo(0);
 	  };
 
-	  Animation.prototype.moveTo=function(timePoint) {
+	  Animation.prototype.moveTo=function(unitPoint) {
 	    this.resetIsPlaying = this.isPlaying;
 	    this.isPlaying = false;
-	    this.delay = -timePoint;
+	    this.delay = -unitPoint;
 	    this.play();
 	  };
 
@@ -347,8 +347,8 @@
 	      if (animationPart.name === 'easing') {
 	        continue;
 	      }
-	      if ((animationPart.time <= currentTimeInMS && animationPart.nextTime >= currentTimeInMS) ||
-	        animationPart.time === animationPart.nextTime && animationPart.time < currentTimeInMS
+	      if ((animationPart.unit <= currentTimeInMS && animationPart.nextUnit >= currentTimeInMS) ||
+	        animationPart.unit === animationPart.nextUnit && animationPart.unit < currentTimeInMS
 	      ) {
 	        if (!newBlocks[animationPart.block]) {
 	          newBlocks[animationPart.block] = {};
@@ -359,7 +359,7 @@
 	          block[animationPart.name] = value;
 	        }
 	      }
-	      if (i === l - 1 && currentTimeInMS >= animationPart.nextTime) {
+	      if (i === l - 1 && currentTimeInMS >= animationPart.nextUnit) {
 	        this.pause();
 	      }
 	    }
@@ -374,34 +374,36 @@
 	Animation.create = function(definition)  {
 	  var animationData = [];
 	  var oldBlocks = {};
-	  var timePoints = Object.keys(definition);
-	  for (var i = 0, l = timePoints.length; i < l; i++) {
-	    var timePoint = timePoints[i];
-	    var parsedTimePoint = parseInt(timePoint.split('ms')[0], 10);
-	    var blocks = Object.keys(definition[timePoint]);
+	  var unitPoints = Object.keys(definition);
+	  for (var i = 0, l = unitPoints.length; i < l; i++) {
+	    var unitPoint = unitPoints[i];
+	    var $__0=    unitPoint.match(/([0-9]*)(ms|px)*/),undefined=$__0[0],unitValue=$__0[1],unitType=$__0[2];
+	    var parsedUnitPoint = parseInt(unitValue, 10);
+	    var blocks = Object.keys(definition[unitPoint]);
 	    for (var j = 0, l2 = blocks.length; j < l2; j++) {
 	      var block = blocks[j];
-	      var properties = Object.keys(definition[timePoint][block]);
+	      var properties = Object.keys(definition[unitPoint][block]);
 	      for (var i2 = 0, l3 = properties.length; i2 < l3; i2++) {
 	        var propertyName = properties[i2];
-	        var easing = definition[timePoint][block].easing || 'linear';
-	        var value = definition[timePoint][block][propertyName];
+	        var easing = definition[unitPoint][block].easing || 'linear';
+	        var value = definition[unitPoint][block][propertyName];
 	        var oldBlock = oldBlocks[block];
 	        if (oldBlock) {
 	          var oldBlockVar = oldBlock[propertyName];
 	          if (oldBlockVar) {
-	            oldBlockVar.nextTime = parsedTimePoint;
+	            oldBlockVar.nextUnit = parsedUnitPoint;
 	            oldBlockVar.nextValue = value;
 	            oldBlockVar.nextEasing = easing;
 	          }
 	        }
 
 	        var obj = {
-	          time: parsedTimePoint,
+	          unit: parsedUnitPoint,
+	          type: unitType,
 	          easing: easing,
 	          block: block,
 	          name: propertyName,
-	          nextTime: parsedTimePoint,
+	          nextUnit: parsedUnitPoint,
 	          value: value,
 	          nextValue: value,
 	          nextEasing: easing
