@@ -62,21 +62,22 @@ class Foo extends React.Component {
         '500ms': {
           blockA: {
             top: 150
-          },
-          blockB: {
-            easing: fooEasing,
-            top: ()=> React.findDOMNode(this.refs.foo).offsetTop
           }
+
         },
         '6000ms': {
           blockA: {
             easing: EasingTypes.spring({
-              mass:     2,
-              spring:   200,
+              mass:     1,
+              spring:   50,
               damping:  3
             }),
             width: 400,
             transform: 'rotate(90deg)'
+          },
+          blockB: {
+            easing: fooEasing,
+            top: ()=> React.findDOMNode(this.refs.foo).offsetTop
           }
         }
       })
