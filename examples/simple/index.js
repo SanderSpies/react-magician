@@ -71,9 +71,9 @@ class Foo extends React.Component {
         '6000ms': {
           blockA: {
             easing: EasingTypes.spring({
-              mass: 1,
-              spring: 400,
-              damping: 20
+              mass:     2,
+              spring:   200,
+              damping:  3
             }),
             width: 400,
             transform: 'rotate(90deg)'
