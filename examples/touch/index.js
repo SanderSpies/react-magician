@@ -81,7 +81,10 @@ class Foo extends React.Component {
     return <div className="main">
       <div className="simple1" style={fooBarAnimationValues.blockA} ref="foo">
       </div>
-      <div className="simple2" style={fooBarAnimationValues.blockB}  onTouchStart={(e) => this.onTouchStart(e)} onTouchMove={(e) => this.onTouchMove(e)}>
+      <div className="simple2" style={fooBarAnimationValues.blockB}
+           onTouchStart={(e) => this.onTouchStart(e)}
+           onTouchMove={momentum(this.onTouchMove, this)}
+           onTouchEnd={momentumEnd}>
       </div>
     </div>;
   }
@@ -92,7 +95,6 @@ class Foo extends React.Component {
 
   onTouchMove(e) {
     var pos = e.touches[0].clientY - this.startY;
-    console.log('foo:', e.touches[0], e.touches[0].clientY, this.startY, pos);
     this.animations.fooBarAnimation.moveTo(pos);
     this.forceUpdate();
   }
