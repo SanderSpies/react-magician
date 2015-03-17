@@ -45,12 +45,14 @@ class Foo extends React.Component {
             top: 0
           }
         },
+
         '100ms': {
           blockA: {
 
             left: 100
           }
         },
+
         '400ms': {
           blockA: {
             left: 200
@@ -59,13 +61,15 @@ class Foo extends React.Component {
             left: ()=> { return React.findDOMNode(this.refs.foo).offsetLeft + 200; }
           }
         },
+
         '500ms': {
           blockA: {
             top: 150
           }
-
         },
-        '6000ms': {
+
+        'a: 600ms - auto': {
+
           blockA: {
             easing: EasingTypes.spring({
               mass:     1,
@@ -75,11 +79,22 @@ class Foo extends React.Component {
             width: 400,
             transform: 'rotate(90deg)'
           },
+
           blockB: {
             easing: fooEasing,
             top: ()=> React.findDOMNode(this.refs.foo).offsetTop
           }
+
+        },
+
+        'a + 100ms': {
+
+          blockA: {
+            width: 800
+          }
+
         }
+
       })
     };
   }
