@@ -68,7 +68,7 @@ class Foo extends React.Component {
           }
         },
 
-        'a: 600ms - auto': {
+        'a: ?ms': {
 
           blockA: {
             easing: EasingTypes.spring({
