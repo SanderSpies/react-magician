@@ -81,7 +81,7 @@ class Foo extends React.Component {
           },
 
           blockB: {
-            easing: fooEasing,
+            easing: fooEasing, // warn that this is not allowed in an auto block
             top: ()=> React.findDOMNode(this.refs.foo).offsetTop
           }
 

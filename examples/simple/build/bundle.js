@@ -114,7 +114,7 @@
 	        '6000ms': {
 	          blockA: {
 	            easing: EasingTypes.spring({
-	              mass:     1,
+	              mass:     .7,
 	              spring:   50,
 	              damping:  3
 	            }),
@@ -434,6 +434,7 @@
 	  var spring = new Spring(opt.mass, opt.spring, opt.damping);
 	  return function(t, b, c, d) {
 	    spring.setEnd(1);
+
 	    return spring.x() * c;
 	  };
 	};
