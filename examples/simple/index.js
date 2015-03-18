@@ -10,22 +10,7 @@ var EasingTypes     = Animation.EasingTypes;
 class Foo extends React.Component {
 
   constructor() {
-
-    function fooEasing(t, b, c, d){
-        var c = c - b;
-        if ((t /= d) < (1 / 2.75)) {
-          return c * (7.5625 * t * t) + b;
-        }
-        else if (t < (2 / 2.75)) {
-          return c * (7.5625 * (t -= (1.5 / 2.75)) * t + .75) + b;
-        }
-        else if (t < (2.5 / 2.75)) {
-          return c * (7.5625 * (t -= (2.25 / 2.75)) * t + .9375) + b;
-        }
-        else {
-          return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
-        }
-    }
+    this.scheduledAnimation = false;
 
     this.state = {
       isPlaying: false
@@ -33,64 +18,45 @@ class Foo extends React.Component {
 
     this.animations = {
       fooBarAnimation: Animation.create({
+
         '0ms': {
           blockA: {
-            left: 0,
-            top: 0,
-            width: 0,
-            transform: 'rotate(0deg)'
-          },
-          blockB: {
-            left: 0,
-            top: 0
-          }
-        },
-
-        '100ms': {
-          blockA: {
-
-            left: 100
-          }
-        },
-
-        '400ms': {
-          blockA: {
-            left: 200
-          },
-          blockB: {
-            left: ()=> { return React.findDOMNode(this.refs.foo).offsetLeft + 200; }
-          }
-        },
-
-        '500ms': {
-          blockA: {
-            top: 150
+            transform: 'rotate(0deg)',
+            height: 200,
+            width: 200,
+            backgroundColor: 'rgb(255, 155, 0)',
+            borderRadius: 0
           }
         },
 
         'a: ?ms': {
 
           blockA: {
+
             easing: EasingTypes.spring({
               mass:     1,
-              spring:   50,
-              damping:  3
+              spring:   30,
+              damping:  4
             }),
-            width: 400,
-            transform: 'rotate(90deg)'
-          },
 
-          blockB: {
-            easing: fooEasing, // warn that this is not allowed in an auto block
-            top: ()=> React.findDOMNode(this.refs.foo).offsetTop
+            height: 400,
+            transform: 'rotate(90deg)',
+            backgroundColor: 'rgb(155, 255, 0)'
           }
 
+        },
+
+        '300ms': {
+          blockA: {
+            width: 500,
+            borderRadius: 100
+          }
         },
 
         'a + 100ms': {
 
           blockA: {
-            width: 800
+            transform: 'rotate(180deg)'
           }
 
         }
@@ -104,8 +70,7 @@ class Foo extends React.Component {
     return <div>
       <div className="simple1" style={fooBarAnimationValues.blockA} ref="foo">
       </div>
-      <div className="simple2" style={fooBarAnimationValues.blockB}>
-      </div>
+
       <div  style={{position:'relative', top: 300}}>
         <button onClick={(e) => this.onPlayPauseButtonClick(e)}>
           Play/Pause
@@ -157,8 +122,13 @@ class Foo extends React.Component {
 
   componentDidUpdate() {
     if (this.animations.fooBarAnimation.isPlaying) {
+      if (this.scheduledAnimation) {
+        return;
+      }
       var self = this;
+      this.scheduledAnimation = true;
       requestAnimationFrame(function() {
+        self.scheduledAnimation = false;
         self.forceUpdate();
       });
     }

@@ -56,22 +56,7 @@
 	var ____Class0=React.Component;for(var ____Class0____Key in ____Class0){if(____Class0.hasOwnProperty(____Class0____Key)){Foo[____Class0____Key]=____Class0[____Class0____Key];}}var ____SuperProtoOf____Class0=____Class0===null?null:____Class0.prototype;Foo.prototype=Object.create(____SuperProtoOf____Class0);Foo.prototype.constructor=Foo;Foo.__superConstructor__=____Class0;
 
 	  function Foo() {
-
-	    function fooEasing(t, b, c, d){
-	        var c = c - b;
-	        if ((t /= d) < (1 / 2.75)) {
-	          return c * (7.5625 * t * t) + b;
-	        }
-	        else if (t < (2 / 2.75)) {
-	          return c * (7.5625 * (t -= (1.5 / 2.75)) * t + .75) + b;
-	        }
-	        else if (t < (2.5 / 2.75)) {
-	          return c * (7.5625 * (t -= (2.25 / 2.75)) * t + .9375) + b;
-	        }
-	        else {
-	          return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
-	        }
-	    }
+	    this.scheduledAnimation = false;
 
 	    this.state = {
 	      isPlaying: false
@@ -79,53 +64,49 @@
 
 	    this.animations = {
 	      fooBarAnimation: Animation.create({
+
 	        '0ms': {
 	          blockA: {
-	            left: 0,
-	            top: 0,
-	            width: 0,
-	            transform: 'rotate(0deg)'
-	          },
-	          blockB: {
-	            left: 0,
-	            top: 0
+	            transform: 'rotate(0deg)',
+	            height: 200,
+	            width: 200,
+	            backgroundColor: 'rgb(255, 155, 0)',
+	            borderRadius: 0
 	          }
 	        },
-	        '100ms': {
+
+	        'a: ?ms': {
+
 	          blockA: {
 
-	            left: 100
-	          }
-	        },
-	        '400ms': {
-	          blockA: {
-	            left: 200
-	          },
-	          blockB: {
-	            left: function() { return React.findDOMNode(this.refs.foo).offsetLeft + 200; }.bind(this)
-	          }
-	        },
-	        '500ms': {
-	          blockA: {
-	            top: 150
-	          }
-
-	        },
-	        '6000ms': {
-	          blockA: {
 	            easing: EasingTypes.spring({
-	              mass:     .7,
-	              spring:   50,
-	              damping:  3
+	              mass:     1,
+	              spring:   30,
+	              damping:  4
 	            }),
-	            width: 400,
-	            transform: 'rotate(90deg)'
-	          },
-	          blockB: {
-	            easing: fooEasing,
-	            top: function() {return React.findDOMNode(this.refs.foo).offsetTop;}.bind(this)
+
+	            height: 400,
+	            transform: 'rotate(90deg)',
+	            backgroundColor: 'rgb(155, 255, 0)'
 	          }
+
+	        },
+
+	        '300ms': {
+	          blockA: {
+	            width: 500,
+	            borderRadius: 100
+	          }
+	        },
+
+	        'a + 100ms': {
+
+	          blockA: {
+	            transform: 'rotate(180deg)'
+	          }
+
 	        }
+
 	      })
 	    };
 	  }
@@ -135,8 +116,7 @@
 	    return React.createElement("div", null, 
 	      React.createElement("div", {className: "simple1", style: fooBarAnimationValues.blockA, ref: "foo"}
 	      ), 
-	      React.createElement("div", {className: "simple2", style: fooBarAnimationValues.blockB}
-	      ), 
+
 	      React.createElement("div", {style: {position:'relative', top: 300}}, 
 	        React.createElement("button", {onClick: function(e)  {return this.onPlayPauseButtonClick(e);}.bind(this)}, 
 	          "Play/Pause"
@@ -188,8 +168,13 @@
 
 	  Foo.prototype.componentDidUpdate=function() {
 	    if (this.animations.fooBarAnimation.isPlaying) {
+	      if (this.scheduledAnimation) {
+	        return;
+	      }
 	      var self = this;
+	      this.scheduledAnimation = true;
 	      requestAnimationFrame(function() {
+	        self.scheduledAnimation = false;
 	        self.forceUpdate();
 	      });
 	    }
@@ -239,12 +224,13 @@
 	  var nextValue = calculateValue(animationPart.nextValue, component);
 	  var type = typeof value;
 	  var nextType = typeof nextValue;
-	  if (animationPart.unit === animationPart.nextUnit) {
+
+	  if (animationPart.unit === animationPart.nextUnit && !animationPart.nextAuto && !animationPart.isAuto) {
 	    return value;
 	  }
-
+	  var easingFunc = typeof animationPart.nextEasing === 'object' ? animationPart.nextEasing.value : animationPart.nextEasing;
 	  if (type === 'number' && nextType === 'number') {
-	    var val = animationPart.nextEasing(currentTimeInMS - animationPart.unit,
+	    var val = easingFunc(currentTimeInMS - animationPart.unit,
 	      value,
 	      nextValue,
 	      animationPart.nextUnit - animationPart.unit);
@@ -254,15 +240,16 @@
 	    var numbers = value.match(/[0-9]+/g);
 	    var nextNumbers = nextValue.match(/[0-9]+/g);
 	    var calculatedNumbers = [];
+	    var noFloat = value.indexOf('rgb') === 0;
 	    if (numbers && nextNumbers && numbers.length === nextNumbers.length) {
 	      for (var i = 0, l = numbers.length; i < l; i++) {
 	        var nr = parseInt(numbers[i], 10);
 	        var nextNr = parseInt(nextNumbers[i], 10);
-	        var val = animationPart.nextEasing(currentTimeInMS - animationPart.unit,
+	        var val = easingFunc(currentTimeInMS - animationPart.unit,
 	          nr,
 	          nextNr,
 	          animationPart.nextUnit - animationPart.unit);
-	        calculatedNumbers[i] = val;
+	        calculatedNumbers[i] = noFloat ? Math.round(val) : val;
 	      }
 	    }
 	    var replace = value.replace(/([0-9])+/g, '{{}}');
@@ -368,9 +355,12 @@
 	          block[animationPart.name] = value;
 	        }
 	      }
-	      if (i === l - 1 && currentTimeInMS >= animationPart.nextUnit) {
-	        this.pause();
-	      }
+
+
+
+	      //if (i === l - 1 && ((!animationPart.isAuto && currentTimeInMS >= animationPart.nextUnit) || (animationPart.nextEasing && animationPart.nextEasing.isDone()))) {
+	      //  this.pause();
+	      //}
 	    }
 
 	    this.currentPosition = currentTimeInMS;
@@ -386,16 +376,44 @@
 	  var unitPoints = Object.keys(definition);
 	  for (var i = 0, l = unitPoints.length; i < l; i++) {
 	    var unitPoint = unitPoints[i];
-	    var $__0=    unitPoint.match(/([0-9]*)(ms|px)*/),undefined=$__0[0],unitValue=$__0[1],unitType=$__0[2];
-	    var parsedUnitPoint = parseInt(unitValue, 10);
-	    var blocks = Object.keys(definition[unitPoint]);
+	    var label = unitPoint.match(/^([a-z?]):*/);
+	    var foo = unitPoint;
+	    var after;
+	    if (label) {
+	      label = label[1];
+	      foo = unitPoint.substr(label.length).trim();
+	      if (foo.indexOf('+') === 0) {
+	        after = label;
+	        label = undefined;
+	      }
+	      foo = foo.substr(2);
+	    }
+
+
+	    var $__0=    foo.match(/([0-9?]*)(ms|px)*/),undefined=$__0[0],unitValue=$__0[1],unitType=$__0[2];
+
+	    var parsedUnitPoint;
+	    var nextAuto = false;
+	    var isAuto = false;
+	    if (unitValue === '?') {
+	      isAuto = true;
+	    } else {
+	      parsedUnitPoint = parseInt(unitValue, 10);
+	    }
+
+	    var definitionUnitPoint = definition[unitPoint];
+	    var blocks = Object.keys(definitionUnitPoint);
 	    for (var j = 0, l2 = blocks.length; j < l2; j++) {
 	      var block = blocks[j];
-	      var properties = Object.keys(definition[unitPoint][block]);
+	      var definitionUnitPointBlock = definitionUnitPoint[block];
+	      var properties = Object.keys(definitionUnitPointBlock);
 	      for (var i2 = 0, l3 = properties.length; i2 < l3; i2++) {
 	        var propertyName = properties[i2];
-	        var easing = definition[unitPoint][block].easing || EasingTypes.linear;
-	        var value = definition[unitPoint][block][propertyName];
+	        if (propertyName === 'easing') {
+	          continue;
+	        }
+	        var easing = definitionUnitPointBlock.easing || EasingTypes.linear;
+	        var value = definitionUnitPointBlock[propertyName];
 	        var oldBlock = oldBlocks[block];
 	        if (oldBlock) {
 	          var oldBlockVar = oldBlock[propertyName];
@@ -403,6 +421,7 @@
 	            oldBlockVar.nextUnit = parsedUnitPoint;
 	            oldBlockVar.nextValue = value;
 	            oldBlockVar.nextEasing = easing;
+	            oldBlockVar.isAuto = isAuto;
 	          }
 	        }
 
@@ -415,7 +434,11 @@
 	          nextUnit: parsedUnitPoint,
 	          value: value,
 	          nextValue: value,
-	          nextEasing: easing
+	          nextEasing: easing,
+	          nextAuto: nextAuto,
+	          isAuto: isAuto,
+	          label: label,
+	          after: after
 	        };
 	        animationData.push(obj);
 	        if (!oldBlocks[block]) {
@@ -425,6 +448,7 @@
 	      }
 	    }
 	  }
+	  console.log('the blocks:', animationData);
 	  return new Animation(animationData)
 	};
 
@@ -432,10 +456,24 @@
 
 	Animation.EasingTypes.spring = function(opt) {
 	  var spring = new Spring(opt.mass, opt.spring, opt.damping);
-	  return function(t, b, c, d) {
-	    spring.setEnd(1);
+	  spring.snap(0);
+	  var isStarted = false;
+	  return {
 
-	    return spring.x() * c;
+	    value: function(t, b, c, d) {
+	      isStarted = true;
+	      spring.setEnd(1);
+	      return b + spring.x() * (c - b);
+	    },
+
+	    isStarted: function() {
+	      return isStarted;
+	    },
+
+	    isDone: function() {
+	      return spring.done() && isStarted;
+	    }
+
 	  };
 	};
 
@@ -11007,7 +11045,7 @@
 	'use strict';
 
 	var ReactUpdates = __webpack_require__(91);
-	var Transaction = __webpack_require__(118);
+	var Transaction = __webpack_require__(119);
 
 	var assign = __webpack_require__(26);
 	var emptyFunction = __webpack_require__(100);
@@ -11083,7 +11121,7 @@
 
 	'use strict';
 
-	var AutoFocusMixin = __webpack_require__(119);
+	var AutoFocusMixin = __webpack_require__(118);
 	var ReactBrowserComponentMixin = __webpack_require__(68);
 	var ReactClass = __webpack_require__(11);
 	var ReactElement = __webpack_require__(14);
@@ -11424,7 +11462,7 @@
 
 	'use strict';
 
-	var AutoFocusMixin = __webpack_require__(119);
+	var AutoFocusMixin = __webpack_require__(118);
 	var DOMPropertyOperations = __webpack_require__(7);
 	var LinkedValueUtils = __webpack_require__(122);
 	var ReactBrowserComponentMixin = __webpack_require__(68);
@@ -11657,7 +11695,7 @@
 
 	'use strict';
 
-	var AutoFocusMixin = __webpack_require__(119);
+	var AutoFocusMixin = __webpack_require__(118);
 	var LinkedValueUtils = __webpack_require__(122);
 	var ReactBrowserComponentMixin = __webpack_require__(68);
 	var ReactClass = __webpack_require__(11);
@@ -11837,7 +11875,7 @@
 
 	'use strict';
 
-	var AutoFocusMixin = __webpack_require__(119);
+	var AutoFocusMixin = __webpack_require__(118);
 	var DOMPropertyOperations = __webpack_require__(7);
 	var LinkedValueUtils = __webpack_require__(122);
 	var ReactBrowserComponentMixin = __webpack_require__(68);
@@ -12218,7 +12256,7 @@
 	var ReactBrowserEventEmitter = __webpack_require__(58);
 	var ReactInputSelection = __webpack_require__(127);
 	var ReactPutListenerQueue = __webpack_require__(128);
-	var Transaction = __webpack_require__(118);
+	var Transaction = __webpack_require__(119);
 
 	var assign = __webpack_require__(26);
 
@@ -13620,7 +13658,7 @@
 
 	'use strict';
 
-	var adler32 = __webpack_require__(141);
+	var adler32 = __webpack_require__(142);
 
 	var ReactMarkupChecksum = {
 	  CHECKSUM_ATTR_NAME: 'data-react-checksum',
@@ -13672,7 +13710,7 @@
 
 	'use strict';
 
-	var ReactRef = __webpack_require__(142);
+	var ReactRef = __webpack_require__(141);
 	var ReactElementValidator = __webpack_require__(15);
 
 	/**
@@ -13789,7 +13827,7 @@
 	var PooledClass = __webpack_require__(42);
 	var ReactCurrentOwner = __webpack_require__(13);
 	var ReactPerf = __webpack_require__(23);
-	var Transaction = __webpack_require__(118);
+	var Transaction = __webpack_require__(119);
 
 	var assign = __webpack_require__(26);
 	var invariant = __webpack_require__(41);
@@ -14735,7 +14773,7 @@
 	var PooledClass = __webpack_require__(42);
 	var CallbackQueue = __webpack_require__(126);
 	var ReactPutListenerQueue = __webpack_require__(128);
-	var Transaction = __webpack_require__(118);
+	var Transaction = __webpack_require__(119);
 
 	var assign = __webpack_require__(26);
 	var emptyFunction = __webpack_require__(100);
@@ -16439,6 +16477,37 @@
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
+	 * @providesModule AutoFocusMixin
+	 * @typechecks static-only
+	 */
+
+	'use strict';
+
+	var focusNode = __webpack_require__(152);
+
+	var AutoFocusMixin = {
+	  componentDidMount: function() {
+	    if (this.props.autoFocus) {
+	      focusNode(this.getDOMNode());
+	    }
+	  }
+	};
+
+	module.exports = AutoFocusMixin;
+
+
+/***/ },
+/* 119 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
 	 * @providesModule Transaction
 	 */
 
@@ -16668,37 +16737,6 @@
 	};
 
 	module.exports = Transaction;
-
-
-/***/ },
-/* 119 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule AutoFocusMixin
-	 * @typechecks static-only
-	 */
-
-	'use strict';
-
-	var focusNode = __webpack_require__(152);
-
-	var AutoFocusMixin = {
-	  componentDidMount: function() {
-	    if (this.props.autoFocus) {
-	      focusNode(this.getDOMNode());
-	    }
-	  }
-	};
-
-	module.exports = AutoFocusMixin;
 
 
 /***/ },
@@ -18369,44 +18407,6 @@
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
-	 * @providesModule adler32
-	 */
-
-	/* jslint bitwise:true */
-
-	'use strict';
-
-	var MOD = 65521;
-
-	// This is a clean-room implementation of adler32 designed for detecting
-	// if markup is not what we expect it to be. It does not need to be
-	// cryptographically strong, only reasonably good at detecting if markup
-	// generated on the server is different than that on the client.
-	function adler32(data) {
-	  var a = 1;
-	  var b = 0;
-	  for (var i = 0; i < data.length; i++) {
-	    a = (a + data.charCodeAt(i)) % MOD;
-	    b = (b + a) % MOD;
-	  }
-	  return a | (b << 16);
-	}
-
-	module.exports = adler32;
-
-
-/***/ },
-/* 142 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
 	 * @providesModule ReactRef
 	 */
 
@@ -18469,6 +18469,44 @@
 	};
 
 	module.exports = ReactRef;
+
+
+/***/ },
+/* 142 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule adler32
+	 */
+
+	/* jslint bitwise:true */
+
+	'use strict';
+
+	var MOD = 65521;
+
+	// This is a clean-room implementation of adler32 designed for detecting
+	// if markup is not what we expect it to be. It does not need to be
+	// cryptographically strong, only reasonably good at detecting if markup
+	// generated on the server is different than that on the client.
+	function adler32(data) {
+	  var a = 1;
+	  var b = 0;
+	  for (var i = 0; i < data.length; i++) {
+	    a = (a + data.charCodeAt(i)) % MOD;
+	    b = (b + a) % MOD;
+	  }
+	  return a | (b << 16);
+	}
+
+	module.exports = adler32;
 
 
 /***/ },
