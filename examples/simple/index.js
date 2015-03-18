@@ -22,8 +22,8 @@ class Foo extends React.Component {
         '0ms': {
           blockA: {
             transform: 'rotate(0deg)',
-            height: 200,
-            width: 200,
+            height: 100,
+            width: 100,
             backgroundColor: 'rgb(255, 155, 0)',
             borderRadius: 0
           }
@@ -39,7 +39,7 @@ class Foo extends React.Component {
               damping:  4
             }),
 
-            height: 400,
+            height: 200,
             transform: 'rotate(90deg)',
             backgroundColor: 'rgb(155, 255, 0)'
           }
@@ -48,7 +48,7 @@ class Foo extends React.Component {
 
         '300ms': {
           blockA: {
-            width: 500,
+            width: 200,
             borderRadius: 100
           }
         },

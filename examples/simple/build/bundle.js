@@ -68,8 +68,8 @@
 	        '0ms': {
 	          blockA: {
 	            transform: 'rotate(0deg)',
-	            height: 200,
-	            width: 200,
+	            height: 100,
+	            width: 100,
 	            backgroundColor: 'rgb(255, 155, 0)',
 	            borderRadius: 0
 	          }
@@ -85,7 +85,7 @@
 	              damping:  4
 	            }),
 
-	            height: 400,
+	            height: 200,
 	            transform: 'rotate(90deg)',
 	            backgroundColor: 'rgb(155, 255, 0)'
 	          }
@@ -94,7 +94,7 @@
 
 	        '300ms': {
 	          blockA: {
-	            width: 500,
+	            width: 200,
 	            borderRadius: 100
 	          }
 	        },
@@ -11045,7 +11045,7 @@
 	'use strict';
 
 	var ReactUpdates = __webpack_require__(91);
-	var Transaction = __webpack_require__(119);
+	var Transaction = __webpack_require__(118);
 
 	var assign = __webpack_require__(26);
 	var emptyFunction = __webpack_require__(100);
@@ -11121,7 +11121,7 @@
 
 	'use strict';
 
-	var AutoFocusMixin = __webpack_require__(118);
+	var AutoFocusMixin = __webpack_require__(119);
 	var ReactBrowserComponentMixin = __webpack_require__(68);
 	var ReactClass = __webpack_require__(11);
 	var ReactElement = __webpack_require__(14);
@@ -11462,7 +11462,7 @@
 
 	'use strict';
 
-	var AutoFocusMixin = __webpack_require__(118);
+	var AutoFocusMixin = __webpack_require__(119);
 	var DOMPropertyOperations = __webpack_require__(7);
 	var LinkedValueUtils = __webpack_require__(122);
 	var ReactBrowserComponentMixin = __webpack_require__(68);
@@ -11695,7 +11695,7 @@
 
 	'use strict';
 
-	var AutoFocusMixin = __webpack_require__(118);
+	var AutoFocusMixin = __webpack_require__(119);
 	var LinkedValueUtils = __webpack_require__(122);
 	var ReactBrowserComponentMixin = __webpack_require__(68);
 	var ReactClass = __webpack_require__(11);
@@ -11875,7 +11875,7 @@
 
 	'use strict';
 
-	var AutoFocusMixin = __webpack_require__(118);
+	var AutoFocusMixin = __webpack_require__(119);
 	var DOMPropertyOperations = __webpack_require__(7);
 	var LinkedValueUtils = __webpack_require__(122);
 	var ReactBrowserComponentMixin = __webpack_require__(68);
@@ -12256,7 +12256,7 @@
 	var ReactBrowserEventEmitter = __webpack_require__(58);
 	var ReactInputSelection = __webpack_require__(127);
 	var ReactPutListenerQueue = __webpack_require__(128);
-	var Transaction = __webpack_require__(119);
+	var Transaction = __webpack_require__(118);
 
 	var assign = __webpack_require__(26);
 
@@ -13658,7 +13658,7 @@
 
 	'use strict';
 
-	var adler32 = __webpack_require__(142);
+	var adler32 = __webpack_require__(141);
 
 	var ReactMarkupChecksum = {
 	  CHECKSUM_ATTR_NAME: 'data-react-checksum',
@@ -13710,7 +13710,7 @@
 
 	'use strict';
 
-	var ReactRef = __webpack_require__(141);
+	var ReactRef = __webpack_require__(142);
 	var ReactElementValidator = __webpack_require__(15);
 
 	/**
@@ -13827,7 +13827,7 @@
 	var PooledClass = __webpack_require__(42);
 	var ReactCurrentOwner = __webpack_require__(13);
 	var ReactPerf = __webpack_require__(23);
-	var Transaction = __webpack_require__(119);
+	var Transaction = __webpack_require__(118);
 
 	var assign = __webpack_require__(26);
 	var invariant = __webpack_require__(41);
@@ -14773,7 +14773,7 @@
 	var PooledClass = __webpack_require__(42);
 	var CallbackQueue = __webpack_require__(126);
 	var ReactPutListenerQueue = __webpack_require__(128);
-	var Transaction = __webpack_require__(119);
+	var Transaction = __webpack_require__(118);
 
 	var assign = __webpack_require__(26);
 	var emptyFunction = __webpack_require__(100);
@@ -16477,37 +16477,6 @@
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
-	 * @providesModule AutoFocusMixin
-	 * @typechecks static-only
-	 */
-
-	'use strict';
-
-	var focusNode = __webpack_require__(152);
-
-	var AutoFocusMixin = {
-	  componentDidMount: function() {
-	    if (this.props.autoFocus) {
-	      focusNode(this.getDOMNode());
-	    }
-	  }
-	};
-
-	module.exports = AutoFocusMixin;
-
-
-/***/ },
-/* 119 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
 	 * @providesModule Transaction
 	 */
 
@@ -16737,6 +16706,37 @@
 	};
 
 	module.exports = Transaction;
+
+
+/***/ },
+/* 119 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule AutoFocusMixin
+	 * @typechecks static-only
+	 */
+
+	'use strict';
+
+	var focusNode = __webpack_require__(152);
+
+	var AutoFocusMixin = {
+	  componentDidMount: function() {
+	    if (this.props.autoFocus) {
+	      focusNode(this.getDOMNode());
+	    }
+	  }
+	};
+
+	module.exports = AutoFocusMixin;
 
 
 /***/ },
@@ -18407,6 +18407,44 @@
 	 * LICENSE file in the root directory of this source tree. An additional grant
 	 * of patent rights can be found in the PATENTS file in the same directory.
 	 *
+	 * @providesModule adler32
+	 */
+
+	/* jslint bitwise:true */
+
+	'use strict';
+
+	var MOD = 65521;
+
+	// This is a clean-room implementation of adler32 designed for detecting
+	// if markup is not what we expect it to be. It does not need to be
+	// cryptographically strong, only reasonably good at detecting if markup
+	// generated on the server is different than that on the client.
+	function adler32(data) {
+	  var a = 1;
+	  var b = 0;
+	  for (var i = 0; i < data.length; i++) {
+	    a = (a + data.charCodeAt(i)) % MOD;
+	    b = (b + a) % MOD;
+	  }
+	  return a | (b << 16);
+	}
+
+	module.exports = adler32;
+
+
+/***/ },
+/* 142 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
 	 * @providesModule ReactRef
 	 */
 
@@ -18469,44 +18507,6 @@
 	};
 
 	module.exports = ReactRef;
-
-
-/***/ },
-/* 142 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule adler32
-	 */
-
-	/* jslint bitwise:true */
-
-	'use strict';
-
-	var MOD = 65521;
-
-	// This is a clean-room implementation of adler32 designed for detecting
-	// if markup is not what we expect it to be. It does not need to be
-	// cryptographically strong, only reasonably good at detecting if markup
-	// generated on the server is different than that on the client.
-	function adler32(data) {
-	  var a = 1;
-	  var b = 0;
-	  for (var i = 0; i < data.length; i++) {
-	    a = (a + data.charCodeAt(i)) % MOD;
-	    b = (b + a) % MOD;
-	  }
-	  return a | (b << 16);
-	}
-
-	module.exports = adler32;
 
 
 /***/ },
