@@ -64,49 +64,30 @@
 
 	    this.animations = {
 	      fooBarAnimation: Animation.create({
-
 	        '0ms': {
 	          blockA: {
-	            transform: 'rotate(0deg)',
-	            height: 100,
-	            width: 100,
-	            backgroundColor: 'rgb(255, 155, 0)',
-	            borderRadius: 0
-	          }
-	        },
-
-	        'a: ?ms': {
-
-	          blockA: {
-
-	            easing: EasingTypes.spring({
-	              mass:     1,
-	              spring:   30,
-	              damping:  4
-	            }),
-
-	            height: 200,
-	            transform: 'rotate(90deg)',
-	            backgroundColor: 'rgb(155, 255, 0)'
-	          }
-
-	        },
-
-	        '300ms': {
-	          blockA: {
+	            left: 0,
+	            position: 'absolute',
+	            top: 0,
 	            width: 200,
-	            borderRadius: 100
+	            transform: 'rotate(0deg)'
 	          }
 	        },
-
-	        'a + 100ms': {
-
+	        '?ms': {
 	          blockA: {
-	            transform: 'rotate(180deg)'
+	            left: 1000,
+	            easing: EasingTypes.spring({
+	              mass: 1,
+	              spring: 30,
+	              damping: 4
+	            })
 	          }
-
+	        },
+	        '400ms': {
+	          blockA: {
+	            top: 300
+	          }
 	        }
-
 	      })
 	    };
 	  }
@@ -116,7 +97,8 @@
 	    return React.createElement("div", null, 
 	      React.createElement("div", {className: "simple1", style: fooBarAnimationValues.blockA, ref: "foo"}
 	      ), 
-
+	      React.createElement("div", {className: "simple2", style: fooBarAnimationValues.blockB}
+	      ), 
 	      React.createElement("div", {style: {position:'relative', top: 300}}, 
 	        React.createElement("button", {onClick: function(e)  {return this.onPlayPauseButtonClick(e);}.bind(this)}, 
 	          "Play/Pause"
@@ -169,7 +151,7 @@
 	  Foo.prototype.componentDidUpdate=function() {
 	    if (this.animations.fooBarAnimation.isPlaying) {
 	      if (this.scheduledAnimation) {
-	        return;
+	       // return;
 	      }
 	      var self = this;
 	      this.scheduledAnimation = true;
@@ -203,6 +185,7 @@
 	var Gravitas = __webpack_require__(6);
 	var Spring = Gravitas.Spring;
 
+
 	function clone(obj) {
 	  var keys = Object.keys(obj);
 	  var newObj = {};
@@ -221,35 +204,34 @@
 
 	function parseValue(animationPart, currentTimeInMS, component) {
 	  var value = calculateValue(animationPart.value, component);
-	  var nextValue = calculateValue(animationPart.nextValue, component);
+	  var nextValue = calculateValue(animationPart.next ? animationPart.next.value : animationPart.value, component);
 	  var type = typeof value;
 	  var nextType = typeof nextValue;
 
-	  if (animationPart.unit === animationPart.nextUnit && !animationPart.nextAuto && !animationPart.isAuto) {
+	  if (!animationPart.next || animationPart.unit === animationPart.next.unit) {
 	    return value;
 	  }
-	  var easingFunc = typeof animationPart.nextEasing === 'object' ? animationPart.nextEasing.value : animationPart.nextEasing;
 	  if (type === 'number' && nextType === 'number') {
-	    var val = easingFunc(currentTimeInMS - animationPart.unit,
+	    var val = animationPart.next.easing.values(currentTimeInMS - animationPart.unit,
 	      value,
 	      nextValue,
-	      animationPart.nextUnit - animationPart.unit);
+	      animationPart.next.unit - animationPart.unit);
+
 	    return val;
 	  }
 	  else if (type === 'string' && nextType === 'string') {
 	    var numbers = value.match(/[0-9]+/g);
 	    var nextNumbers = nextValue.match(/[0-9]+/g);
 	    var calculatedNumbers = [];
-	    var noFloat = value.indexOf('rgb') === 0;
 	    if (numbers && nextNumbers && numbers.length === nextNumbers.length) {
 	      for (var i = 0, l = numbers.length; i < l; i++) {
 	        var nr = parseInt(numbers[i], 10);
 	        var nextNr = parseInt(nextNumbers[i], 10);
-	        var val = easingFunc(currentTimeInMS - animationPart.unit,
+	        var val = animationPart.next.easing.values(currentTimeInMS - animationPart.unit,
 	          nr,
 	          nextNr,
-	          animationPart.nextUnit - animationPart.unit);
-	        calculatedNumbers[i] = noFloat ? Math.round(val) : val;
+	          animationPart.next.unit - animationPart.unit);
+	        calculatedNumbers[i] = val;
 	      }
 	    }
 	    var replace = value.replace(/([0-9])+/g, '{{}}');
@@ -338,14 +320,19 @@
 	    var currentTimeInMS = (Date.now() - this.delay - this.startingTime - this.currentDelayStartingTime) * this.speed;
 	    var newBlocks = {};
 	    var animationData = this.animationData;
+	    var isBusy = false;
 	    for (var i = 0, l = animationData.length; i < l; i++) {
 	      var animationPart = animationData[i];
-	      if (animationPart.name === 'easing') {
+
+	      if (animationPart.name === 'easing' ||
+	        (animationPart.next && animationPart.next.easing && animationPart.next.easing.isDone())) {
 	        continue;
 	      }
-	      if ((animationPart.unit <= currentTimeInMS && animationPart.nextUnit >= currentTimeInMS) ||
-	        animationPart.unit === animationPart.nextUnit && animationPart.unit < currentTimeInMS
-	      ) {
+
+	      if (!animationPart.previous || (animationPart.easing && animationPart.easing.isDone())) {
+	        if (animationPart.next) {
+	          isBusy = true;
+	        }
 	        if (!newBlocks[animationPart.block]) {
 	          newBlocks[animationPart.block] = {};
 	        }
@@ -355,12 +342,10 @@
 	          block[animationPart.name] = value;
 	        }
 	      }
+	    }
 
-
-
-	      //if (i === l - 1 && ((!animationPart.isAuto && currentTimeInMS >= animationPart.nextUnit) || (animationPart.nextEasing && animationPart.nextEasing.isDone()))) {
-	      //  this.pause();
-	      //}
+	    if (!isBusy) {
+	      this.pause();
 	    }
 
 	    this.currentPosition = currentTimeInMS;
@@ -376,70 +361,38 @@
 	  var unitPoints = Object.keys(definition);
 	  for (var i = 0, l = unitPoints.length; i < l; i++) {
 	    var unitPoint = unitPoints[i];
-	    var label = unitPoint.match(/^([a-z?]):*/);
-	    var foo = unitPoint;
-	    var after;
-	    if (label) {
-	      label = label[1];
-	      foo = unitPoint.substr(label.length).trim();
-	      if (foo.indexOf('+') === 0) {
-	        after = label;
-	        label = undefined;
-	      }
-	      foo = foo.substr(2);
-	    }
-
-
-	    var $__0=    foo.match(/([0-9?]*)(ms|px)*/),undefined=$__0[0],unitValue=$__0[1],unitType=$__0[2];
-
-	    var parsedUnitPoint;
-	    var nextAuto = false;
-	    var isAuto = false;
-	    if (unitValue === '?') {
-	      isAuto = true;
-	    } else {
-	      parsedUnitPoint = parseInt(unitValue, 10);
-	    }
-
+	    var $__0=    unitPoint.match(/([0-9]*)(ms|px)*/),undefined=$__0[0],unitValue=$__0[1],unitType=$__0[2];
+	    var parsedUnitPoint = parseInt(unitValue, 10);
 	    var definitionUnitPoint = definition[unitPoint];
-	    var blocks = Object.keys(definitionUnitPoint);
-	    for (var j = 0, l2 = blocks.length; j < l2; j++) {
-	      var block = blocks[j];
+	    var blockNames = Object.keys(definitionUnitPoint);
+	    for (var j = 0, l2 = blockNames.length; j < l2; j++) {
+	      var block = blockNames[j];
 	      var definitionUnitPointBlock = definitionUnitPoint[block];
 	      var properties = Object.keys(definitionUnitPointBlock);
 	      for (var i2 = 0, l3 = properties.length; i2 < l3; i2++) {
 	        var propertyName = properties[i2];
-	        if (propertyName === 'easing') {
-	          continue;
-	        }
-	        var easing = definitionUnitPointBlock.easing || EasingTypes.linear;
 	        var value = definitionUnitPointBlock[propertyName];
+	        var obj = {
+	          unit: parsedUnitPoint,
+	          type: unitType,
+	          easing: null,
+	          block: block,
+	          name: propertyName,
+	          next: null,
+	          previous: null,
+	          value: value
+	        };
+
 	        var oldBlock = oldBlocks[block];
 	        if (oldBlock) {
 	          var oldBlockVar = oldBlock[propertyName];
 	          if (oldBlockVar) {
-	            oldBlockVar.nextUnit = parsedUnitPoint;
-	            oldBlockVar.nextValue = value;
-	            oldBlockVar.nextEasing = easing;
-	            oldBlockVar.isAuto = isAuto;
+	            oldBlockVar.next = obj;
+	            obj.previous = oldBlockVar;
+	            obj.easing = definition[unitPoint][block].easing || EasingTypes.linear();
 	          }
 	        }
 
-	        var obj = {
-	          unit: parsedUnitPoint,
-	          type: unitType,
-	          easing: easing,
-	          block: block,
-	          name: propertyName,
-	          nextUnit: parsedUnitPoint,
-	          value: value,
-	          nextValue: value,
-	          nextEasing: easing,
-	          nextAuto: nextAuto,
-	          isAuto: isAuto,
-	          label: label,
-	          after: after
-	        };
 	        animationData.push(obj);
 	        if (!oldBlocks[block]) {
 	          oldBlocks[block] = {};
@@ -448,7 +401,6 @@
 	      }
 	    }
 	  }
-	  console.log('the blocks:', animationData);
 	  return new Animation(animationData)
 	};
 
@@ -460,7 +412,7 @@
 	  var isStarted = false;
 	  return {
 
-	    value: function(t, b, c, d) {
+	    values: function(t, b, c, d) {
 	      isStarted = true;
 	      spring.setEnd(1);
 	      return b + spring.x() * (c - b);
@@ -495,9 +447,28 @@
 	  // in value this is what the repo's interpolation plugin api will use. Here,
 	  // c will stand for final value
 
-	  linear: function(t, b, _c, d) {
-	    var c = _c - b;
-	    return t * c / d + b;
+	  linear: function() {
+	    return {
+	      props: {
+	        _isDone: false
+	      },
+	      values: function(t, b, _c, d) {
+	        var c = _c - b;
+	        if (this.props._isDone) {
+	          return _c;
+	        }
+	        var result = t * c / d + b;
+	        if (t > d) {
+	          this.props._isDone = true;
+	          result = _c;
+	        }
+	        return result;
+	      },
+	      isDone: function() {
+	        return this.props._isDone;
+	      }
+	    };
+
 	  },
 	  easeInQuad: function(t, b, _c, d) {
 	    var c = _c - b;
@@ -9644,9 +9615,9 @@
 	var EventConstants = __webpack_require__(40);
 	var EventPropagators = __webpack_require__(111);
 	var ExecutionEnvironment = __webpack_require__(29);
-	var FallbackCompositionState = __webpack_require__(112);
-	var SyntheticCompositionEvent = __webpack_require__(113);
-	var SyntheticInputEvent = __webpack_require__(114);
+	var FallbackCompositionState = __webpack_require__(114);
+	var SyntheticCompositionEvent = __webpack_require__(115);
+	var SyntheticInputEvent = __webpack_require__(116);
 
 	var keyOf = __webpack_require__(51);
 
@@ -10148,10 +10119,10 @@
 	var EventPropagators = __webpack_require__(111);
 	var ExecutionEnvironment = __webpack_require__(29);
 	var ReactUpdates = __webpack_require__(91);
-	var SyntheticEvent = __webpack_require__(115);
+	var SyntheticEvent = __webpack_require__(112);
 
 	var isEventSupported = __webpack_require__(59);
-	var isTextInputElement = __webpack_require__(116);
+	var isTextInputElement = __webpack_require__(113);
 	var keyOf = __webpack_require__(51);
 
 	var topLevelTypes = EventConstants.topLevelTypes;
@@ -12433,10 +12404,10 @@
 	var EventConstants = __webpack_require__(40);
 	var EventPropagators = __webpack_require__(111);
 	var ReactInputSelection = __webpack_require__(127);
-	var SyntheticEvent = __webpack_require__(115);
+	var SyntheticEvent = __webpack_require__(112);
 
 	var getActiveElement = __webpack_require__(129);
-	var isTextInputElement = __webpack_require__(116);
+	var isTextInputElement = __webpack_require__(113);
 	var keyOf = __webpack_require__(51);
 	var shallowEqual = __webpack_require__(130);
 
@@ -12668,7 +12639,7 @@
 	var EventPluginUtils = __webpack_require__(8);
 	var EventPropagators = __webpack_require__(111);
 	var SyntheticClipboardEvent = __webpack_require__(131);
-	var SyntheticEvent = __webpack_require__(115);
+	var SyntheticEvent = __webpack_require__(112);
 	var SyntheticFocusEvent = __webpack_require__(132);
 	var SyntheticKeyboardEvent = __webpack_require__(133);
 	var SyntheticMouseEvent = __webpack_require__(117);
@@ -15974,200 +15945,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
-	 * Copyright 2013 Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule FallbackCompositionState
-	 * @typechecks static-only
-	 */
-
-	'use strict';
-
-	var PooledClass = __webpack_require__(42);
-
-	var assign = __webpack_require__(26);
-	var getTextContentAccessor = __webpack_require__(150);
-
-	/**
-	 * This helper class stores information about text content of a target node,
-	 * allowing comparison of content before and after a given event.
-	 *
-	 * Identify the node where selection currently begins, then observe
-	 * both its text content and its current position in the DOM. Since the
-	 * browser may natively replace the target node during composition, we can
-	 * use its position to find its replacement.
-	 *
-	 * @param {DOMEventTarget} root
-	 */
-	function FallbackCompositionState(root) {
-	  this._root = root;
-	  this._startText = this.getText();
-	  this._fallbackText = null;
-	}
-
-	assign(FallbackCompositionState.prototype, {
-	  /**
-	   * Get current text of input.
-	   *
-	   * @return {string}
-	   */
-	  getText: function() {
-	    if ('value' in this._root) {
-	      return this._root.value;
-	    }
-	    return this._root[getTextContentAccessor()];
-	  },
-
-	  /**
-	   * Determine the differing substring between the initially stored
-	   * text content and the current content.
-	   *
-	   * @return {string}
-	   */
-	  getData: function() {
-	    if (this._fallbackText) {
-	      return this._fallbackText;
-	    }
-
-	    var start;
-	    var startValue = this._startText;
-	    var startLength = startValue.length;
-	    var end;
-	    var endValue = this.getText();
-	    var endLength = endValue.length;
-
-	    for (start = 0; start < startLength; start++) {
-	      if (startValue[start] !== endValue[start]) {
-	        break;
-	      }
-	    }
-
-	    var minEnd = startLength - start;
-	    for (end = 1; end <= minEnd; end++) {
-	      if (startValue[startLength - end] !== endValue[endLength - end]) {
-	        break;
-	      }
-	    }
-
-	    var sliceTail = end > 1 ? 1 - end : undefined;
-	    this._fallbackText = endValue.slice(start, sliceTail);
-	    return this._fallbackText;
-	  }
-	});
-
-	PooledClass.addPoolingTo(FallbackCompositionState);
-
-	module.exports = FallbackCompositionState;
-
-
-/***/ },
-/* 113 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013-2014, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule SyntheticCompositionEvent
-	 * @typechecks static-only
-	 */
-
-	'use strict';
-
-	var SyntheticEvent = __webpack_require__(115);
-
-	/**
-	 * @interface Event
-	 * @see http://www.w3.org/TR/DOM-Level-3-Events/#events-compositionevents
-	 */
-	var CompositionEventInterface = {
-	  data: null
-	};
-
-	/**
-	 * @param {object} dispatchConfig Configuration used to dispatch this event.
-	 * @param {string} dispatchMarker Marker identifying the event target.
-	 * @param {object} nativeEvent Native browser event.
-	 * @extends {SyntheticUIEvent}
-	 */
-	function SyntheticCompositionEvent(
-	  dispatchConfig,
-	  dispatchMarker,
-	  nativeEvent) {
-	  SyntheticEvent.call(this, dispatchConfig, dispatchMarker, nativeEvent);
-	}
-
-	SyntheticEvent.augmentClass(
-	  SyntheticCompositionEvent,
-	  CompositionEventInterface
-	);
-
-	module.exports = SyntheticCompositionEvent;
-
-
-/***/ },
-/* 114 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
-	 * Copyright 2013 Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule SyntheticInputEvent
-	 * @typechecks static-only
-	 */
-
-	'use strict';
-
-	var SyntheticEvent = __webpack_require__(115);
-
-	/**
-	 * @interface Event
-	 * @see http://www.w3.org/TR/2013/WD-DOM-Level-3-Events-20131105
-	 *      /#events-inputevents
-	 */
-	var InputEventInterface = {
-	  data: null
-	};
-
-	/**
-	 * @param {object} dispatchConfig Configuration used to dispatch this event.
-	 * @param {string} dispatchMarker Marker identifying the event target.
-	 * @param {object} nativeEvent Native browser event.
-	 * @extends {SyntheticUIEvent}
-	 */
-	function SyntheticInputEvent(
-	  dispatchConfig,
-	  dispatchMarker,
-	  nativeEvent) {
-	  SyntheticEvent.call(this, dispatchConfig, dispatchMarker, nativeEvent);
-	}
-
-	SyntheticEvent.augmentClass(
-	  SyntheticInputEvent,
-	  InputEventInterface
-	);
-
-	module.exports = SyntheticInputEvent;
-
-
-/***/ },
-/* 115 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/**
 	 * Copyright 2013-2014, Facebook, Inc.
 	 * All rights reserved.
 	 *
@@ -16334,7 +16111,7 @@
 
 
 /***/ },
-/* 116 */
+/* 113 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -16378,6 +16155,200 @@
 	}
 
 	module.exports = isTextInputElement;
+
+
+/***/ },
+/* 114 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013 Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule FallbackCompositionState
+	 * @typechecks static-only
+	 */
+
+	'use strict';
+
+	var PooledClass = __webpack_require__(42);
+
+	var assign = __webpack_require__(26);
+	var getTextContentAccessor = __webpack_require__(150);
+
+	/**
+	 * This helper class stores information about text content of a target node,
+	 * allowing comparison of content before and after a given event.
+	 *
+	 * Identify the node where selection currently begins, then observe
+	 * both its text content and its current position in the DOM. Since the
+	 * browser may natively replace the target node during composition, we can
+	 * use its position to find its replacement.
+	 *
+	 * @param {DOMEventTarget} root
+	 */
+	function FallbackCompositionState(root) {
+	  this._root = root;
+	  this._startText = this.getText();
+	  this._fallbackText = null;
+	}
+
+	assign(FallbackCompositionState.prototype, {
+	  /**
+	   * Get current text of input.
+	   *
+	   * @return {string}
+	   */
+	  getText: function() {
+	    if ('value' in this._root) {
+	      return this._root.value;
+	    }
+	    return this._root[getTextContentAccessor()];
+	  },
+
+	  /**
+	   * Determine the differing substring between the initially stored
+	   * text content and the current content.
+	   *
+	   * @return {string}
+	   */
+	  getData: function() {
+	    if (this._fallbackText) {
+	      return this._fallbackText;
+	    }
+
+	    var start;
+	    var startValue = this._startText;
+	    var startLength = startValue.length;
+	    var end;
+	    var endValue = this.getText();
+	    var endLength = endValue.length;
+
+	    for (start = 0; start < startLength; start++) {
+	      if (startValue[start] !== endValue[start]) {
+	        break;
+	      }
+	    }
+
+	    var minEnd = startLength - start;
+	    for (end = 1; end <= minEnd; end++) {
+	      if (startValue[startLength - end] !== endValue[endLength - end]) {
+	        break;
+	      }
+	    }
+
+	    var sliceTail = end > 1 ? 1 - end : undefined;
+	    this._fallbackText = endValue.slice(start, sliceTail);
+	    return this._fallbackText;
+	  }
+	});
+
+	PooledClass.addPoolingTo(FallbackCompositionState);
+
+	module.exports = FallbackCompositionState;
+
+
+/***/ },
+/* 115 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013-2014, Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule SyntheticCompositionEvent
+	 * @typechecks static-only
+	 */
+
+	'use strict';
+
+	var SyntheticEvent = __webpack_require__(112);
+
+	/**
+	 * @interface Event
+	 * @see http://www.w3.org/TR/DOM-Level-3-Events/#events-compositionevents
+	 */
+	var CompositionEventInterface = {
+	  data: null
+	};
+
+	/**
+	 * @param {object} dispatchConfig Configuration used to dispatch this event.
+	 * @param {string} dispatchMarker Marker identifying the event target.
+	 * @param {object} nativeEvent Native browser event.
+	 * @extends {SyntheticUIEvent}
+	 */
+	function SyntheticCompositionEvent(
+	  dispatchConfig,
+	  dispatchMarker,
+	  nativeEvent) {
+	  SyntheticEvent.call(this, dispatchConfig, dispatchMarker, nativeEvent);
+	}
+
+	SyntheticEvent.augmentClass(
+	  SyntheticCompositionEvent,
+	  CompositionEventInterface
+	);
+
+	module.exports = SyntheticCompositionEvent;
+
+
+/***/ },
+/* 116 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * Copyright 2013 Facebook, Inc.
+	 * All rights reserved.
+	 *
+	 * This source code is licensed under the BSD-style license found in the
+	 * LICENSE file in the root directory of this source tree. An additional grant
+	 * of patent rights can be found in the PATENTS file in the same directory.
+	 *
+	 * @providesModule SyntheticInputEvent
+	 * @typechecks static-only
+	 */
+
+	'use strict';
+
+	var SyntheticEvent = __webpack_require__(112);
+
+	/**
+	 * @interface Event
+	 * @see http://www.w3.org/TR/2013/WD-DOM-Level-3-Events-20131105
+	 *      /#events-inputevents
+	 */
+	var InputEventInterface = {
+	  data: null
+	};
+
+	/**
+	 * @param {object} dispatchConfig Configuration used to dispatch this event.
+	 * @param {string} dispatchMarker Marker identifying the event target.
+	 * @param {object} nativeEvent Native browser event.
+	 * @extends {SyntheticUIEvent}
+	 */
+	function SyntheticInputEvent(
+	  dispatchConfig,
+	  dispatchMarker,
+	  nativeEvent) {
+	  SyntheticEvent.call(this, dispatchConfig, dispatchMarker, nativeEvent);
+	}
+
+	SyntheticEvent.augmentClass(
+	  SyntheticInputEvent,
+	  InputEventInterface
+	);
+
+	module.exports = SyntheticInputEvent;
 
 
 /***/ },
@@ -17706,7 +17677,7 @@
 
 	'use strict';
 
-	var SyntheticEvent = __webpack_require__(115);
+	var SyntheticEvent = __webpack_require__(112);
 
 	/**
 	 * @interface Event
@@ -17984,7 +17955,7 @@
 
 	'use strict';
 
-	var SyntheticEvent = __webpack_require__(115);
+	var SyntheticEvent = __webpack_require__(112);
 
 	var getEventTarget = __webpack_require__(124);
 

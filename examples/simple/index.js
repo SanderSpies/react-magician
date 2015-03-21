@@ -18,49 +18,30 @@ class Foo extends React.Component {
 
     this.animations = {
       fooBarAnimation: Animation.create({
-
         '0ms': {
           blockA: {
-            transform: 'rotate(0deg)',
-            height: 100,
-            width: 100,
-            backgroundColor: 'rgb(255, 155, 0)',
-            borderRadius: 0
-          }
-        },
-
-        'a: ?ms': {
-
-          blockA: {
-
-            easing: EasingTypes.spring({
-              mass:     1,
-              spring:   30,
-              damping:  4
-            }),
-
-            height: 200,
-            transform: 'rotate(90deg)',
-            backgroundColor: 'rgb(155, 255, 0)'
-          }
-
-        },
-
-        '300ms': {
-          blockA: {
+            left: 0,
+            position: 'absolute',
+            top: 0,
             width: 200,
-            borderRadius: 100
+            transform: 'rotate(0deg)'
           }
         },
-
-        'a + 100ms': {
-
+        '?ms': {
           blockA: {
-            transform: 'rotate(180deg)'
+            left: 1000,
+            easing: EasingTypes.spring({
+              mass: 1,
+              spring: 30,
+              damping: 4
+            })
           }
-
+        },
+        '400ms': {
+          blockA: {
+            top: 300
+          }
         }
-
       })
     };
   }
@@ -70,7 +51,8 @@ class Foo extends React.Component {
     return <div>
       <div className="simple1" style={fooBarAnimationValues.blockA} ref="foo">
       </div>
-
+      <div className="simple2" style={fooBarAnimationValues.blockB}>
+      </div>
       <div  style={{position:'relative', top: 300}}>
         <button onClick={(e) => this.onPlayPauseButtonClick(e)}>
           Play/Pause
@@ -123,7 +105,7 @@ class Foo extends React.Component {
   componentDidUpdate() {
     if (this.animations.fooBarAnimation.isPlaying) {
       if (this.scheduledAnimation) {
-        return;
+       // return;
       }
       var self = this;
       this.scheduledAnimation = true;
