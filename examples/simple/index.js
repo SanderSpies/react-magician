@@ -25,11 +25,15 @@ class Foo extends React.Component {
             top: 0,
             width: 200,
             transform: 'rotate(0deg)'
+          },
+          blockB: {
+            left: 0
           }
         },
         'a: ?ms': {
           blockA: {
-            left: 1000,
+            left: 100,
+            transform: 'rotate(90deg)',
             easing: EasingTypes.spring({
               mass: 1,
               spring: 30,
@@ -39,18 +43,33 @@ class Foo extends React.Component {
         },
         '400ms': {
           blockA: {
-            top: 300
+            top: 30
+          }
+        },
+        'b: ?ms': {
+          blockB: {
+            left: 1000,
+            easing: EasingTypes.spring({
+              mass: 1,
+              spring: 50,
+              damping: 3
+            })
           }
         },
         'a + 100ms': {
           blockA: {
-            left: 200
+            left: 20
           }
         },
         'a + 2000ms': {
           blockA: {
             left: 100//,
             //TODO: make this work top: 0
+          }
+        },
+        'b + 200ms': {
+          blockB: {
+            left: 100
           }
         }
         //'3000ms': {
