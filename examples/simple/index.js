@@ -27,7 +27,7 @@ class Foo extends React.Component {
             transform: 'rotate(0deg)'
           }
         },
-        '?ms': {
+        'a: ?ms': {
           blockA: {
             left: 1000,
             easing: EasingTypes.spring({
@@ -41,7 +41,23 @@ class Foo extends React.Component {
           blockA: {
             top: 300
           }
+        },
+        'a + 100ms': {
+          blockA: {
+            left: 200
+          }
+        },
+        'a + 2000ms': {
+          blockA: {
+            left: 100//,
+            //TODO: make this work top: 0
+          }
         }
+        //'3000ms': {
+        //  blockA: {
+        //    top: -300
+        //  }
+        //}
       })
     };
   }
