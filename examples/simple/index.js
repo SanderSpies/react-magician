@@ -24,7 +24,7 @@ class Foo extends React.Component {
             position: 'absolute',
             top: 0,
             width: 200,
-            transform: 'rotate(0deg)'
+            //transform: 'rotate(0deg)'
           },
           blockB: {
             left: 0
@@ -33,7 +33,7 @@ class Foo extends React.Component {
         'a: ?ms': {
           blockA: {
             left: 100,
-            transform: 'rotate(90deg)',
+            //transform: 'rotate(90deg)',
             easing: EasingTypes.spring({
               mass: 1,
               spring: 30,
@@ -71,7 +71,9 @@ class Foo extends React.Component {
           blockB: {
             left: 100
           }
-        }
+        }//,
+        // TODO: 'a + b + 300ms' (should be dependent on multiple labeled blocks)
+
         //'3000ms': {
         //  blockA: {
         //    top: -300
