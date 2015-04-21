@@ -13,6 +13,7 @@
     "timeline"
   ],
   "dependencies": {
-    "gravitas": "git+https://github.com/SanderSpies/gravitas.js.git"
+    "gravitas": "git+https://github.com/SanderSpies/gravitas.js.git",
+    "react": "^0.13.0"
   }
 }
